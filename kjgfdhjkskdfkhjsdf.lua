@@ -32,6 +32,7 @@ getgenv().predict = true
 local predict_power = 0.01
 local prevpos_need = nil
 local Virtual = game:GetService("VirtualInputManager")
+local aiming_toggled = true
 ff3:Toggle("Auto Fire", function(isToggled)
     
     getgenv().firing = isToggled
@@ -42,7 +43,7 @@ ff3:Toggle("Auto Fire", function(isToggled)
                 if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default then
                     if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
                         
-                        if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value then
+                        if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
                             if getgenv().predict then
                                 prevpos_need = mouse.Hit.Position
                                 camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power)
@@ -51,12 +52,14 @@ ff3:Toggle("Auto Fire", function(isToggled)
                                 camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                             end
                             if mouse.Target == i.Character.HeadHB then
+                                aiming_toggled = false
                                 game:GetService("RunService").Heartbeat:Wait()
                                 Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
                                 game:GetService("RunService").PreRender:Wait()
                                 camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
                                 task.wait(0.03)
                                 Virtual:SendMouseButtonEvent(10, 10, 0, false, game.Workspace, 0)
+                                aiming_toggled = true
                             else
                                 camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
                             end
