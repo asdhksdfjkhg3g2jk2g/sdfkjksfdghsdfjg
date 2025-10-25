@@ -30,44 +30,44 @@ local object_to_off = nil
 getgenv().double = false
 getgenv().predict = true
 local predict_power = 0.01
-
+local prevpos_need = nil
 local Virtual = game:GetService("VirtualInputManager")
-ff3:Toggle("Auto Fire [BETA]", function(isToggled)
+ff3:Toggle("Auto Fire", function(isToggled)
     
     getgenv().firing = isToggled
+    task.spawn(function()
+        while game:GetService("RunService").PreSimulation:Wait() do
 
-    local checking = game:GetService("RunService").RenderStepped:Connect(function()
-
-        for _, i in pairs(game.Players:GetPlayers()) do
-            if getgenv().firing then
-                if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
-                    
-                    if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value then
-                        local prevpos_need = mouse.Hit.Position
-                        if getgenv().predict then
-                            camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power)
-                        else
-                            camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
-                        end
-                        if mouse.Target == i.Character.HeadHB then
-                            Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
-                            task.wait(0.03)
-                            Virtual:SendMouseButtonEvent(10, 10, 0, false, game.Workspace, 0)
-                            camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
-                        else
-                            camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
+            for _, i in pairs(game.Players:GetPlayers()) do
+                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default then
+                    if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
+                        
+                        if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value then
+                            if getgenv().predict then
+                                prevpos_need = mouse.Hit.Position
+                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power)
+                            else
+                                prevpos_need = mouse.Hit.Position
+                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
+                            end
+                            if mouse.Target == i.Character.HeadHB then
+                                game:GetService("RunService").Heartbeat:Wait()
+                                Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
+                                game:GetService("RunService").PreRender:Wait()
+                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
+                                task.wait(0.03)
+                                Virtual:SendMouseButtonEvent(10, 10, 0, false, game.Workspace, 0)
+                            else
+                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
+                            end
                         end
                     end
+                else
+                    break
                 end
-            else
-                break
             end
         end
     end)
-    if not getgenv().firing then
-        checking:Disconnect()
-    end
-    
 
 end)
 ff3:Toggle("Rage Aim", function(isToggled)
@@ -588,7 +588,7 @@ end)
 aa2:Slider("Delay", 1, 20, function(currentValue)
     delay = currentValue
 end)
-info:Label("Version: 3.1")
+info:Label("Version: 3.15")
 info:Label("Developed by steel_the_developer (discord)")
 info:Label("Discord Forum : https://discord.gg/E5Tt4yYYMr")
 info:Button("Copy", function()
