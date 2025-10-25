@@ -206,6 +206,7 @@ scale:Slider("Head Scale", 1, 20, function(currentValue)
 end)
 local clr1, clr2, clr3 = 255, 255, 255
 local clr12, clr22, clr32 = 255, 255, 255
+local transpa_chams = 0.6
 chams:Slider("Color Red", 1, 255, function(currentValue)
     clr = currentValue
 end)
@@ -214,6 +215,9 @@ chams:Slider("Color Green", 1, 255, function(currentValue)
 end)
 chams:Slider("Color Blue", 1, 255, function(currentValue)
     clr3 = currentValue
+end)
+chams:Slider("Transparency", 1, 100, function(currentValue)
+    transpa_chams = currentValue / 100
 end)
 chams:Toggle("Chams", function(isToggled)
     print(isToggled)
@@ -224,6 +228,7 @@ chams:Toggle("Chams", function(isToggled)
             local Instanc = Instance.new("Highlight", i.Character)
             Instanc.Name = "BOXESP"
             Instanc.FillColor = Color3.fromRGB(clr, clr2, clr3)
+            Instanc.FillTransparency = transpa_chams
             print(2)
         elseif not getgenv().esp and i.Character and i.Character:FindFirstChild("BOXESP") then
             i.Character.BOXESP:Destroy()
@@ -235,6 +240,7 @@ chams:Toggle("Chams", function(isToggled)
             local Instanc = Instance.new("Highlight", i)
             Instanc.Name = "BOXESP"
             Instanc.FillColor = Color3.fromRGB(clr, clr2, clr3)
+            Instanc.FillTransparency = transpa_chams
             print(2)
         end
     end)
@@ -243,10 +249,11 @@ chams:Toggle("Chams", function(isToggled)
     end
 
 end)
-chams:Button("Apply Color", function()
+chams:Button("Apply Changes", function()
     for _, i in pairs(game.Workspace:GetDescendants()) do
         if i.Name == "BOXESP" and i:IsA("Highlight") then
             i.FillColor = Color3.fromRGB(clr, clr2, clr3)
+            i.FillTransparency = transpa_chams
         end
     end
 end)
@@ -287,6 +294,7 @@ player:Toggle("FOV Enabled", function(isToggled)
         end
     end)
 end)
+local transpa_arms = 0.6
 model_changer:Slider("Color Red", 1, 255, function(currentValue)
     clr12 = currentValue
 end)
@@ -296,6 +304,9 @@ end)
 model_changer:Slider("Color Blue", 1, 255, function(currentValue)
     clr32 = currentValue
 end)
+model_changer:Slider("Transparency", 1, 100, function(currentValue)
+    transpa_arms = currentValue / 100
+end)
 model_changer:Button("Apply Arms's Colors", function()
     
     task.spawn(function()
@@ -303,8 +314,10 @@ model_changer:Button("Apply Arms's Colors", function()
     
             if i:IsA("Part") then
                 i.Color = Color3.fromRGB(clr12, clr22, clr32)
-                end
+                i.FillTransparency = transpa_arms
             end
+            
+        end
     
     end)
 end)
@@ -316,6 +329,7 @@ model_changer:Toggle("Arms ESP", function(isToggled)
                 local armESP = Instance.new("Highlight", workspace.Camera:FindFirstChild("Arms"))
                 armESP.Name = "Arms_ESP"
                 armESP.FillColor = Color3.fromRGB(clr12, clr22, clr32)
+                armESP.FillTransparency = transpa_arms
             end
         end
     end)
@@ -383,7 +397,7 @@ trace:Button("Bullet Tracers Apply", function()
     game:GetService("ReplicatedStorage").VisualizeModule.Trail.MaxLength = length
 end)
 local size = 0.25
-local imp_clr1, imp_clr2, imp_clr3 = Color3.fromRGB()
+local imp_clr1, imp_clr2, imp_clr3 = Color3.fromRGB(), Color3.fromRGB(), Color3.fromRGB()
 
 impacts_sect:Slider("Color Red", 0, 255, function(currentValue)
     imp_clr1 = currentValue
