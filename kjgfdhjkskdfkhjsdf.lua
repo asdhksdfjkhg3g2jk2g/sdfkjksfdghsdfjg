@@ -33,14 +33,19 @@ local predict_power = 0.01
 local prevpos_need = nil
 local Virtual = game:GetService("VirtualInputManager")
 local aiming_toggled = true
+local inp = game:GetService("UserInputService")
+getgenv().backward = false
+getgenv().Pitch = false
+local toggle2 = true
+
 ff3:Toggle("Auto Fire", function(isToggled)
     
     getgenv().firing = isToggled
     task.spawn(function()
-        while game:GetService("RunService").PreSimulation:Wait() do
+        game:GetService("RunService").RenderStepped:Connect(function()
 
             for _, i in pairs(game.Players:GetPlayers()) do
-                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default then
+                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default and aiming_toggled then
                     if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
                         
                         if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
@@ -53,12 +58,19 @@ ff3:Toggle("Auto Fire", function(isToggled)
                             end
                             if mouse.Target == i.Character.HeadHB then
                                 aiming_toggled = false
-                                game:GetService("RunService").Heartbeat:Wait()
-                                Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
-                                game:GetService("RunService").PreRender:Wait()
-                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
-                                task.wait(0.03)
-                                Virtual:SendMouseButtonEvent(10, 10, 0, false, game.Workspace, 0)
+                                task.spawn(function()
+                                    toggle2 = false
+                                    task.wait(0.09)
+                                    toggle2 = true
+                                end)
+                                task.spawn(function()
+                                    Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
+                                    task.wait(0.03)
+                                    Virtual:SendMouseButtonEvent(10, 10, 0, false, game.Workspace, 0)
+                                end)
+                                task.defer(function()
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
+                                end)
                                 aiming_toggled = true
                             else
                                 camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
@@ -69,7 +81,7 @@ ff3:Toggle("Auto Fire", function(isToggled)
                     break
                 end
             end
-        end
+        end)
     end)
 
 end)
@@ -92,12 +104,19 @@ ff3:Toggle("Rage Aim", function(isToggled)
                                 prevplrpos = magnited
                                 if is and is.Character and is.Character:FindFirstChild("HumanoidRootPart") then
                                     if getgenv().predict then
+                                        task.spawn(function()
+                                            toggle2 = false
+                                            task.wait(0.09)
+                                            toggle2 = true
+                                        end)
                                         camera.CFrame = CFrame.lookAt(camera.CFrame.Position, is.Character.HeadHB.Position + is.Character.HeadHB.Velocity * predict_power)
                                         game:GetService("RunService").RenderStepped:Wait()
                                         break
                                     else
+                                        getgenv().Pitch = false
                                         camera.CFrame = CFrame.lookAt(camera.CFrame.Position, is.Character.HeadHB.Position)
                                         game:GetService("RunService").RenderStepped:Wait()
+                                        getgenv().Pitch = true
                                     end
                                 end
                             elseif magnited > prevplrpos then
@@ -150,6 +169,104 @@ ff3:Slider("Prediction Power", 1, 35, function(currentValue)
     predict_power = currentValue / 100
 end)
 
+aa2:Toggle("Void Sync", function(isToggled)
+    getgenv().voidsync = isToggled
+    task.spawn(function()
+        while task.wait() and getgenv().voidsync do
+
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(math.random(124303030, 194303030), math.random(124303030, 194303030), math.random(124303030, 194303030))
+                print("Teleported")
+            end
+
+        end
+    end)
+end)
+
+
+aa1:Toggle("Fakelag Desync", function(isToggled)
+    getgenv().flag = isToggled
+	game:GetService("RunService").PostSimulation:Connect(function()
+        if getgenv().flag and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character.HumanoidRootPart.Anchored = true
+            game:GetService("RunService").Heartbeat:Wait()
+            plr.Character.HumanoidRootPart.Anchored = false
+            game:GetService("RunService").RenderStepped:Wait()
+        end
+    end)
+end)
+local toggle1 = true
+local delay = 0.05
+local main_camera
+getgenv().jitter = false
+aa2:Toggle("Backward", function(isToggled)
+    getgenv().backward = isToggled
+    
+    local enabla = game:GetService("RunService").RenderStepped:Connect(function ()
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward and plr.Character:FindFirstChild("Humanoid") then
+            plr.Character.Humanoid.AutoRotate = false
+            main_camera = workspace.CurrentCamera
+            plr.Character.HumanoidRootPart.CFrame = CFrame.lookAt(plr.Character.HumanoidRootPart.CFrame.Position, Vector3.new(main_camera.CFrame.Position.X, plr.Character.HumanoidRootPart.CFrame.Position.Y, main_camera.CFrame.Position.Z))
+        end
+    end)
+    if not getgenv().backward then
+        enabla:Disconnect()
+        plr.Character.Humanoid.AutoRotate = true
+    end
+end)
+
+aa2:Toggle("Head Jitter", function(isToggled)
+    getgenv().jitter = isToggled
+    task.spawn(function()
+        while task.wait() and getgenv().jitter do
+            for i = 1, 2 do
+                toggle1 = false
+                if i == 1 and getgenv().jitter then
+                    local args = {
+                        -0.24901966750621796,
+                        true
+                    }
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"):FireServer(unpack(args))
+        
+                else
+                    local args = {
+                        -0.916449910402298,
+                        false
+                    }
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"):FireServer(unpack(args))
+                end
+                task.wait(delay / 100)
+                toggle1 = true
+            end
+        end
+    end)     
+    
+    local talbe = getrawmetatable(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"))
+    
+    local old = talbe.__namecall
+    setreadonly(talbe, false)
+    
+    if getgenv().jitter then
+        talbe.__namecall = function(self, ...)
+            
+            if getnamecallmethod() == "FireServer" and not checkcaller() and toggle1 and getgenv().jitter then
+                return nil
+            end
+            return old(self, ...)
+        end
+    elseif not getgenv().jitter then
+        talbe.__namecall = old
+    end
+
+end)
+aa2:Slider("Delay", 1, 20, function(currentValue)
+    delay = currentValue
+end)
+
+
+
+
 ff:Button("No Spread", function()
     for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
         
@@ -168,7 +285,7 @@ ff:Button("No Fire Rate", function()
         
     end
 end)
-ff2:Button("Infinite Ammo", function()
+ff2:Button("Inf Ammo", function()
     for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
         
         if i.Name == "Ammo" or i.Name == "StoredAmmo" then
@@ -467,8 +584,11 @@ impacts_sect:Toggle("Impacts", function(isToggled)
     end)
 end)
 
-
-local inp = game:GetService("UserInputService")
+move:Button("Remove Fall Damage", function()
+    if game:GetService("ReplicatedStorage").Events:FindFirstChild("FallDamage") then
+        game:GetService("ReplicatedStorage").Events.FallDamage:Destroy()
+    end
+end)
 move:Toggle("Bunny Hop", function(isToggled)
     print(isToggled)
     getgenv().bhop = isToggled
@@ -489,17 +609,32 @@ move:Toggle("Auto Strafer", function(isToggled)
     getgenv().strafer = isToggled
     local strafer_self = game:GetService("RunService").RenderStepped:Connect(function()
     
-        if getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") then
+        if getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
             plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
             task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") then
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
             plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped  
             task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") then
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
             plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped
             task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") then
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
             plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
+            task.wait(0.8)
+
+            ----------
+
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped  
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
             task.wait(0.8)
         end
         
@@ -515,83 +650,8 @@ end)
 move:Slider("Strafe Speed", 1, 650, function(currentValue)
     sped = currentValue
 end)
-aa2:Toggle("Void Sync", function(isToggled)
-    getgenv().voidsync = isToggled
-    task.spawn(function()
-        while task.wait() and getgenv().voidsync do
 
-            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                
-                plr.Character.HumanoidRootPart.CFrame = CFrame.new(math.random(124303030, 194303030), math.random(124303030, 194303030), math.random(124303030, 194303030))
-                print("Teleported")
-            end
-
-        end
-    end)
-end)
-
-
-aa1:Toggle("Fakelag Desync", function(isToggled)
-    getgenv().flag = isToggled
-	game:GetService("RunService").PostSimulation:Connect(function()
-        if getgenv().flag and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            plr.Character.HumanoidRootPart.Anchored = true
-            game:GetService("RunService").Heartbeat:Wait()
-            plr.Character.HumanoidRootPart.Anchored = false
-            game:GetService("RunService").RenderStepped:Wait()
-        end
-    end)
-end)
-local toggle1 = true
-local delay = 0.05
-aa2:Toggle("Head Jitter", function(isToggled)
-    getgenv().jitter = isToggled
-    task.spawn(function()
-        while task.wait() and getgenv().jitter do
-            for i = 1, 2 do
-                toggle1 = false
-                if i == 1 and getgenv().jitter then
-                    local args = {
-                        -0.24901966750621796,
-                        true
-                    }
-                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"):FireServer(unpack(args))
-        
-                else
-                    local args = {
-                        -0.916449910402298,
-                        false
-                    }
-                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"):FireServer(unpack(args))
-                end
-                task.wait(delay / 100)
-                toggle1 = true
-            end
-        end
-    end)     
-    
-    local talbe = getrawmetatable(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"))
-    
-    local old = talbe.__namecall
-    setreadonly(talbe, false)
-    
-    if getgenv().jitter then
-        talbe.__namecall = function(self, ...)
-            
-            if getnamecallmethod() == "FireServer" and not checkcaller() and toggle1 and getgenv().jitter then
-                return nil
-            end
-            return old(self, ...)
-        end
-    elseif not getgenv().jitter then
-        talbe.__namecall = old
-    end
-
-end)
-aa2:Slider("Delay", 1, 20, function(currentValue)
-    delay = currentValue
-end)
-info:Label("Version: 3.15")
+info:Label("Version: ENCODE #1")
 info:Label("Developed by steel_the_developer (discord)")
 info:Label("Discord Forum : https://discord.gg/E5Tt4yYYMr")
 info:Button("Copy", function()
