@@ -396,7 +396,7 @@ player:Toggle("Third Person", function(isToggled)
     
 end)
 local view = 70
-player:Slider("Field of View (FOV)", 40, 180, function(currentValue)
+player:Slider("Field of View (FOV)", 40, 100, function(currentValue)
     view = currentValue
 end)
 player:Toggle("FOV Enabled", function(isToggled)
@@ -434,7 +434,7 @@ model_changer:Button("Apply Arms's Colors", function()
     
             if i:IsA("Part") then
                 i.Color = Color3.fromRGB(clr12, clr22, clr32)
-                i.FillTransparency = transpa_arms
+                i.Transparency = transpa_arms
             end
             
         end
