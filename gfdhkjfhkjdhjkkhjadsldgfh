@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))() --you can go into the github link and copy all of it and modify it for yourself.
-local Window = Library:CreateWindow("gamescript.rage V4", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
+local Window = Library:CreateWindow("gamescript.rage V4.2", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
 local rage = Window:CreateTab("Ragebot")
 local antiaim = Window:CreateTab("Anti Aim")
 local vis = Window:CreateTab("Visuals")
@@ -28,6 +28,7 @@ local auto = rage:CreateSector("Automatic", "left")
 local predict_power2 = 0.15
 getgenv().predict2 = false
 getgenv().forcestopping = false
+getgenv().jit = false
 auto:AddToggle("Auto Shoot", false, function(isToggled)
     getgenv().firing = isToggled
     task.spawn(function()
@@ -280,51 +281,39 @@ move:AddToggle("Bunny Hop", false, function(isToggled)
     end
 end)
 local sped = 1
+local camera_forstrafe
 move:AddToggle("Auto Strafer", false, function(isToggled)
     print(isToggled)
     getgenv().strafer = isToggled
-    local strafer_self = game:GetService("RunService").RenderStepped:Connect(function()
-    
-        if getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped  
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
-            task.wait(0.8)
+    task.spawn(function()
+        while task.wait() and getgenv().strafer do
 
-            ----------
-
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped  
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
-            task.wait(0.8)
-        end
+            if getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
+                camera_forstrafe = workspace.CurrentCamera
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(camera_forstrafe.CFrame.LookVector.X, 0, camera_forstrafe.CFrame.LookVector.Z) * sped)
+                
+            elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
+                camera_forstrafe = workspace.CurrentCamera
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(camera_forstrafe.CFrame.RightVector.X, 0, camera_forstrafe.CFrame.RightVector.Z) * sped)
+            elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
+                camera_forstrafe = workspace.CurrentCamera
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(-camera_forstrafe.CFrame.RightVector.X, 0, -camera_forstrafe.CFrame.RightVector.Z) * sped)
+                
+            elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
+                camera_forstrafe = workspace.CurrentCamera
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(-camera_forstrafe.CFrame.LookVector.X, 0, -camera_forstrafe.CFrame.LookVector.Z) * sped)
+            end
+                ----------
+            
+            if getgenv().strafer and plr.Character and inp:IsKeyDown("Space") and plr.Character:FindFirstChild("HumanoidRootPart") then
+                plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
+            end
         
-        if getgenv().strafer and plr.Character and inp:IsKeyDown("Space") and plr.Character:FindFirstChild("HumanoidRootPart") then
-            plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
         end
-    
     end)
-    if not getgenv().strafer then
-        strafer_self:Disconnect()
-    end
 end)
-move:AddSlider("Boost Strafe", 1, 200, 650, 1, function(currentValue)
-    sped = currentValue
+move:AddSlider("Boost Strafe", 1, 250, 1500, 1, function(currentValue)
+    sped = currentValue / 1000
 end)
 
 local desync = antiaim:CreateSector("Desync", "right")
@@ -374,6 +363,55 @@ aa_plr:AddToggle("Backward", false, function(isToggled)
     if not getgenv().backward then
         enabla:Disconnect()
         plr.Character.Humanoid.AutoRotate = true
+    end
+end)
+local jitter_delay = 0.1
+local stepping = 90
+aa_plr:AddToggle("Yaw Jitter", false, function(isToggled)
+    getgenv().jit = isToggled
+    task.spawn(function()
+        while task.wait() and getgenv().jit do
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().jit and plr.Character:FindFirstChild("Humanoid") then
+                plr.Character.Humanoid.AutoRotate = false
+                plr.Character.HumanoidRootPart.CFrame *= CFrame.Angles(0, stepping, 0)
+                task.wait(jitter_delay)
+            end
+        end
+        if not getgenv().jit and plr.Character and plr.Character:FindFirstChild("Humanoid") then
+            plr.Character.Humanoid.AutoRotate = true
+        end
+    end)
+end)
+aa_plr:AddSlider("Step", 1, 90, 190, 1, function(currentValue)
+    stepping = currentValue
+end)
+aa_plr:AddSlider("Delay", 1, 100, 1000, 1, function(currentValue)
+    jitter_delay = currentValue / 1000
+end)
+getgenv().jitter = false
+aa_plr:AddToggle("Pitch Down", false, function(isToggled)
+    getgenv().down = isToggled   
+    
+    local table_down = getrawmetatable(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"))
+    task.spawn(function()
+        while task.wait() and getgenv().down do
+            getgenv().jitter = false
+        end
+    end)
+    local old = table_down.__namecall
+    setreadonly(table_down, false)
+    
+    if getgenv().down then
+        table_down.__namecall = function(self, ...)
+            local main_args = {...}
+            if getnamecallmethod() == "FireServer" and not checkcaller() and toggle1 and getgenv().down and table.find(main_args, false) then
+                print("Downed")
+                return old(self, unpack({-0.9, false}))
+            end
+            return old(self, ...)
+        end
+    elseif not getgenv().down then
+        table_down.__namecall = old
     end
 end)
 
