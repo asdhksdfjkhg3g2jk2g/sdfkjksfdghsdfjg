@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))() --you can go into the github link and copy all of it and modify it for yourself.
-local Window = Library:CreateWindow("gamescript.rage V4 -- RECODE", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
+local Window = Library:CreateWindow("gamescript.rage V4", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
 local rage = Window:CreateTab("Ragebot")
 local antiaim = Window:CreateTab("Anti Aim")
 local vis = Window:CreateTab("Visuals")
@@ -23,27 +23,41 @@ getgenv().Pitch = false
 local toggle2 = true
 
 
-local aim = rage:CreateSector("Aimbot", "left")
+local aim = rage:CreateSector("Aimbot", "right")
 
-aim:AddToggle("Auto Shoot", false, function(isToggled)
+local auto = rage:CreateSector("Automatic", "left")
+local predict_power2 = 0.15
+getgenv().predict2 = false
+getgenv().forcestopping = false
+auto:AddToggle("Auto Shoot", false, function(isToggled)
     getgenv().firing = isToggled
     task.spawn(function()
         game:GetService("RunService").RenderStepped:Connect(function()
 
             for _, i in pairs(game.Players:GetPlayers()) do
-                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default and aiming_toggled then
+                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default and aiming_toggled and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health ~= 0 then
                     if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
                         
                         if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
-                            if getgenv().predict then
+                            if getgenv().predict2 then
                                 prevpos_need = mouse.Hit.Position
-                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power)
+                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
                             else
                                 prevpos_need = mouse.Hit.Position
                                 camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                             end
                             if mouse.Target == i.Character.HeadHB then
                                 aiming_toggled = false
+                                task.spawn(function()
+                                    if getgenv().forcestopping and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                                        for id = 0, 3 do
+                                            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                                                plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+                                            end
+                                            task.wait(0.08)
+                                        end
+                                    end
+                                end)
                                 task.spawn(function()
                                     toggle2 = false
                                     task.wait(0.09)
@@ -56,6 +70,7 @@ aim:AddToggle("Auto Shoot", false, function(isToggled)
                                 end)
                                 task.defer(function()
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
+                                    
                                 end)
                                 aiming_toggled = true
                             else
@@ -70,6 +85,18 @@ aim:AddToggle("Auto Shoot", false, function(isToggled)
         end)
     end)
 end)
+
+auto:AddToggle("Prediction", false, function(isToggled)
+    getgenv().predict2 = isToggled
+end)
+auto:AddSlider("Prediction Value", 1, 5, 35, 1, function(currentValue)
+    predict_power2 = currentValue / 100
+end)
+
+auto:AddToggle("Force Stop", false, function(isToggled)
+    getgenv().forcestopping = isToggled
+end)
+
 aim:AddToggle("Rage Aimbot", false, function(isToggled)
 
     getgenv().aim = isToggled
