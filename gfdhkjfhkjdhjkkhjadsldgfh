@@ -1,0 +1,630 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))() --you can go into the github link and copy all of it and modify it for yourself.
+local Window = Library:CreateWindow("gamescript.rage V4 -- RECODE", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
+local rage = Window:CreateTab("Ragebot")
+local antiaim = Window:CreateTab("Anti Aim")
+local vis = Window:CreateTab("Visuals")
+local cfgs = Window:CreateTab("Config")
+
+local plr = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local mouse = plr:GetMouse()
+local toggle = true
+local prevplrpos = math.huge
+local object_to_off = nil
+getgenv().double = false
+getgenv().predict = true
+local predict_power = 0.01
+local prevpos_need = nil
+local Virtual = game:GetService("VirtualInputManager")
+local aiming_toggled = true
+local inp = game:GetService("UserInputService")
+getgenv().backward = false
+getgenv().Pitch = false
+local toggle2 = true
+
+
+local aim = rage:CreateSector("Aimbot", "left")
+
+aim:AddToggle("Auto Shoot", false, function(isToggled)
+    getgenv().firing = isToggled
+    task.spawn(function()
+        game:GetService("RunService").RenderStepped:Connect(function()
+
+            for _, i in pairs(game.Players:GetPlayers()) do
+                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default and aiming_toggled then
+                    if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
+                        
+                        if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
+                            if getgenv().predict then
+                                prevpos_need = mouse.Hit.Position
+                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power)
+                            else
+                                prevpos_need = mouse.Hit.Position
+                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
+                            end
+                            if mouse.Target == i.Character.HeadHB then
+                                aiming_toggled = false
+                                task.spawn(function()
+                                    toggle2 = false
+                                    task.wait(0.09)
+                                    toggle2 = true
+                                end)
+                                task.spawn(function()
+                                    Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
+                                    task.wait(0.03)
+                                    Virtual:SendMouseButtonEvent(10, 10, 0, false, game.Workspace, 0)
+                                end)
+                                task.defer(function()
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
+                                end)
+                                aiming_toggled = true
+                            else
+                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
+                            end
+                        end
+                    end
+                else
+                    break
+                end
+            end
+        end)
+    end)
+end)
+aim:AddToggle("Rage Aimbot", false, function(isToggled)
+
+    getgenv().aim = isToggled
+    mouse.Button1Up:Connect(function()
+        task.wait(0.3)
+    	toggle = false
+    end)
+    mouse.Button1Down:Connect(function()
+    	toggle = true
+    	task.spawn(function()
+        	while game:GetService("RunService").Stepped:Wait() and toggle and getgenv().aim do
+        	    for _, is in pairs(game.Players:GetPlayers()) do
+                    if is and is.Name ~= plr.Name and is.Character ~= nil and is.Character:FindFirstChild("HeadHB") and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                        if is.Status.Team.Value ~= plr.Status.Team.Value then
+                            local magnited = (is.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
+                            if magnited < prevplrpos then
+                                prevplrpos = magnited
+                                if is and is.Character and is.Character:FindFirstChild("HumanoidRootPart") then
+                                    if getgenv().predict then
+                                        task.spawn(function()
+                                            toggle2 = false
+                                            task.wait(0.09)
+                                            toggle2 = true
+                                        end)
+                                        camera.CFrame = CFrame.lookAt(camera.CFrame.Position, is.Character.HeadHB.Position + is.Character.HeadHB.Velocity * predict_power)
+                                        game:GetService("RunService").RenderStepped:Wait()
+                                        break
+                                    else
+                                        getgenv().Pitch = false
+                                        camera.CFrame = CFrame.lookAt(camera.CFrame.Position, is.Character.HeadHB.Position)
+                                        game:GetService("RunService").RenderStepped:Wait()
+                                        getgenv().Pitch = true
+                                    end
+                                end
+                            elseif magnited > prevplrpos then
+                                prevplrpos = magnited
+                            end
+                        end
+                    end
+                end
+        	end
+        end)
+    end)
+
+end)
+
+aim:AddToggle("Camera at Opponent", false, function(isToggled)
+    getgenv().atp = isToggled
+    
+    task.spawn(function()
+        local camera_status = game:GetService("RunService").RenderStepped:Connect(function ()
+            if getgenv().atp then
+                for _, i in pairs(game.Players:GetPlayers()) do
+                    
+                    if i.Name ~= plr.Name and i.Character and plr.Character and plr.Character:FindFirstChild("LowerTorso") and i.Character:FindFirstChild("HeadHB") and plr.Status.Team.Value ~= i.Status.Team.Value and i.Status.Team.Value ~= "Spectator" then
+                        
+                        camera.CameraType = Enum.CameraType.Scriptable
+                        if getgenv().predict then
+                            camera.CFrame = CFrame.lookAt(i.Character.HumanoidRootPart.Position + i.Character.HumanoidRootPart.Velocity * predict_power, i.Character.HeadHB.Position)
+                        else
+                            camera.CFrame = CFrame.lookAt(i.Character.HumanoidRootPart.Position, i.Character.HeadHB.Position)
+                        end
+                        object_to_off = i
+
+                    end
+
+                end
+            end
+        end)
+        if not getgenv().atp then
+            camera_status:Disconnect()
+            camera.CameraType = Enum.CameraType.Custom
+        end
+    end)
+end)
+
+aim:AddToggle("Prediction", false, function(isToggled)
+    getgenv().predict = isToggled
+end)
+aim:AddSlider("Prediction Value", 1, 5, 35, 1, function(currentValue)
+    predict_power = currentValue / 100
+end)
+
+local remov = rage:CreateSector("Noes", "right")
+
+remov:AddButton("No Spread", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "Spread" or i.Name == "Crouch" and i.Name == "Fire" or i.Name == "InitialJump" or i.Name == "Jump" or i.Name == "Ladder" or i.Name == "Land" or i.Name == "Move" or i.Name == "Recoil" or i.Name == "RecoveryTime" or i.Name == "Stand" then
+            i.Value = 0
+        end
+        
+    end
+end)
+remov:AddButton("No Fire Rate", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "FireRate" then
+            i.Value = 0
+        end
+        
+    end
+end)
+
+local scale = rage:CreateSector("Scale", "left")
+
+scale:AddSlider("Head Scale", 1, 10, 20, 1, function(currentValue)
+    for _, i in pairs(game.Players:GetPlayers()) do
+        if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("HeadHB") then
+            print(currentValue)
+            size = currentValue
+            i.Character.HeadHB.Size = Vector3.new(currentValue, currentValue, currentValue)
+            i.Character.HeadHB.OriginalSize.Value = Vector3.new(currentValue, currentValue, currentValue)
+            i.Character.Hat2.Handle.Size = Vector3.new(currentValue, currentValue, currentValue)
+        end
+    end
+end)
+scale:AddButton("Apply", function()
+    for _, i in pairs(game.Players:GetPlayers()) do
+        if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("HeadHB") and i.Character:FindFirstChild("Hat2") then
+            print("Applied")
+            i.Character.HeadHB.Size = Vector3.new(size, size, size)
+            i.Character.HeadHB.OriginalSize.Value = Vector3.new(size, size, size)
+            i.Character.Hat2.Handle.Size = Vector3.new(size, size, size)
+        end
+    end
+    game.DescendantAdded:Connect(function(i)
+        if i.Name == "HeadHB" then
+            task.wait()
+            i.Size = Vector3.new(size, size, size)
+        end
+    end)
+end)
+
+
+local weapon = rage:CreateSector("Weapon Changers", "right")
+
+weapon:AddButton("Infinite Ammo", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "Ammo" or i.Name == "StoredAmmo" then
+            i.Value = 10000000
+        end
+        
+    end
+end)
+weapon:AddButton("Wallbang", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "Penetration" or i.Name == "ArmorPenetration" then
+            i.Value = 10000000
+        end
+        
+    end
+end)
+weapon:AddButton("No Reload Rate", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "ReloadTime" then
+            i.Value = 0.01
+        end
+        
+    end
+end)
+local move = rage:CreateSector("Movement", "left")
+move:AddButton("Remove Fall Damage", function()
+    if game:GetService("ReplicatedStorage").Events:FindFirstChild("FallDamage") then
+        game:GetService("ReplicatedStorage").Events.FallDamage:Destroy()
+    end
+end)
+move:AddToggle("Bunny Hop", false, function(isToggled)
+    print(isToggled)
+    getgenv().bhop = isToggled
+    local bhopping_status = game:GetService("RunService").RenderStepped:Connect(function()
+        if getgenv().bhop and inp:IsKeyDown(Enum.KeyCode.Space) and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Running then
+            
+            plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            
+        end
+    end)
+    if not getgenv().bhop then
+        bhopping_status:Disconnect()
+    end
+end)
+local sped = 1
+move:AddToggle("Auto Strafer", false, function(isToggled)
+    print(isToggled)
+    getgenv().strafer = isToggled
+    local strafer_self = game:GetService("RunService").RenderStepped:Connect(function()
+    
+        if getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped  
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
+            task.wait(0.8)
+
+            ----------
+
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped  
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
+            task.wait(0.8)
+        end
+        
+        if getgenv().strafer and plr.Character and inp:IsKeyDown("Space") and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
+        end
+    
+    end)
+    if not getgenv().strafer then
+        strafer_self:Disconnect()
+    end
+end)
+move:AddSlider("Boost Strafe", 1, 200, 650, 1, function(currentValue)
+    sped = currentValue
+end)
+
+local desync = antiaim:CreateSector("Desync", "right")
+local aa_plr = antiaim:CreateSector("Player", "left")
+
+aa_plr:AddToggle("Void Sync", false, function(isToggled)
+    getgenv().voidsync = isToggled
+    task.spawn(function()
+        while task.wait() and getgenv().voidsync do
+
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(math.random(124303030, 194303030), math.random(124303030, 194303030), math.random(124303030, 194303030))
+                print("Teleported")
+            end
+
+        end
+    end)
+end)
+
+desync:AddToggle("Fakelag Desync", false, function(isToggled)
+    getgenv().flag = isToggled
+	game:GetService("RunService").PostSimulation:Connect(function()
+        if getgenv().flag and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character.HumanoidRootPart.Anchored = true
+            game:GetService("RunService").Heartbeat:Wait()
+            plr.Character.HumanoidRootPart.Anchored = false
+            game:GetService("RunService").RenderStepped:Wait()
+        end
+    end)
+end)
+local toggle1 = true
+local delay = 0.05
+local main_camera
+getgenv().jitter = false
+
+aa_plr:AddToggle("Backward", false, function(isToggled)
+    getgenv().backward = isToggled
+    
+    local enabla = game:GetService("RunService").RenderStepped:Connect(function ()
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward and plr.Character:FindFirstChild("Humanoid") then
+            plr.Character.Humanoid.AutoRotate = false
+            main_camera = workspace.CurrentCamera
+            plr.Character.HumanoidRootPart.CFrame = CFrame.lookAt(plr.Character.HumanoidRootPart.CFrame.Position, Vector3.new(main_camera.CFrame.Position.X, plr.Character.HumanoidRootPart.CFrame.Position.Y, main_camera.CFrame.Position.Z))
+        end
+    end)
+    if not getgenv().backward then
+        enabla:Disconnect()
+        plr.Character.Humanoid.AutoRotate = true
+    end
+end)
+
+aa_plr:AddToggle("Head Jitter", false, function(isToggled)
+    getgenv().jitter = isToggled
+    task.spawn(function()
+        while task.wait() and getgenv().jitter do
+            for i = 1, 2 do
+                toggle1 = false
+                if i == 1 and getgenv().jitter then
+                    local args = {
+                        -0.24901966750621796,
+                        true
+                    }
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"):FireServer(unpack(args))
+        
+                else
+                    local args = {
+                        -0.916449910402298,
+                        false
+                    }
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"):FireServer(unpack(args))
+                end
+                task.wait(delay / 100)
+                toggle1 = true
+            end
+        end
+    end)     
+    
+    local talbe = getrawmetatable(game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ControlTurn"))
+    
+    local old = talbe.__namecall
+    setreadonly(talbe, false)
+    
+    if getgenv().jitter then
+        talbe.__namecall = function(self, ...)
+            
+            if getnamecallmethod() == "FireServer" and not checkcaller() and toggle1 and getgenv().jitter then
+                return nil
+            end
+            return old(self, ...)
+        end
+    elseif not getgenv().jitter then
+        talbe.__namecall = old
+    end
+end)
+
+aa_plr:AddSlider("Delay", 1, 10, 20, 1, function(currentValue)
+    delay = currentValue
+end)
+
+local clr1, clr, clr2, clr3 = 255, 255, 255
+local clr12, clr22, clr32 = 255, 255, 255
+local transpa_chams = 0.6
+
+local chams = vis:CreateSector("Chams", "left")
+
+chams:AddSlider("Red", 1, 150, 255, 1, function(currentValue)
+    clr = currentValue
+end)
+chams:AddSlider("Green", 1, 150, 255, 1, function(currentValue)
+    clr2 = currentValue
+end)
+chams:AddSlider("Blue", 1, 150, 255, 1, function(currentValue)
+    clr3 = currentValue
+end)
+
+chams:AddSlider("Transparency", 1, 10, 100, 1, function(currentValue)
+    transpa_chams = currentValue / 100
+end)
+
+chams:AddToggle("Chams", false, function(isToggled) 
+
+    getgenv().esp = isToggled
+    for _, i in pairs(game.Players:GetPlayers()) do
+        if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("UpperTorso") and getgenv().esp and i.Status.Team.Value ~= plr.Status.Team.Value then
+            print(1)
+            local Instanc = Instance.new("Highlight", i.Character)
+            Instanc.Name = "BOXESP"
+            Instanc.FillColor = Color3.fromRGB(clr, clr2, clr3)
+            Instanc.FillTransparency = transpa_chams
+            print(2)
+        elseif not getgenv().esp and i.Character and i.Character:FindFirstChild("BOXESP") then
+            i.Character.BOXESP:Destroy()
+        end
+    end
+    local descendants_hooking = game.DescendantAdded:Connect(function(i)
+        if getgenv().esp and i:IsA("Model") and game.Players:FindFirstChild(i.Name) and game.Players:FindFirstChild(i.Name) and game.Players:FindFirstChild(i.Name).Status.Team.Value ~= plr.Status.Team.Value then
+            print(1)
+            local Instanc = Instance.new("Highlight", i)
+            Instanc.Name = "BOXESP"
+            Instanc.FillColor = Color3.fromRGB(clr, clr2, clr3)
+            Instanc.FillTransparency = transpa_chams
+            print(2)
+        end
+    end)
+    if not getgenv().esp then
+        descendants_hooking:Disconnect()
+    end
+
+end)
+
+chams:AddButton("Apply Changes", function()
+    for _, i in pairs(game.Workspace:GetDescendants()) do
+        if i.Name == "BOXESP" and i:IsA("Highlight") then
+            i.FillColor = Color3.fromRGB(clr, clr2, clr3)
+            i.FillTransparency = transpa_chams
+        end
+    end
+end)
+
+local localview = vis:CreateSector("Local", "Right")
+local dist = 45
+
+localview:AddToggle("Third Person", false, function(isToggled)
+    getgenv().third = isToggled
+    local third_status = game:GetService("RunService").RenderStepped:Connect(function()
+        if getgenv().third then
+            plr.CameraMaxZoomDistance = dist
+        else
+            plr.CameraMaxZoomDistance = 0
+        end
+    end)
+    if not getgenv().third then
+        third_status:Disconnect()
+    end
+    
+end)
+localview:AddSlider("ThirdPerson Distance", 16, 50, 100, 1, function(currentValue)
+    dist = currentValue
+end)
+local fov = 70
+
+localview:AddSlider("FOV (Field of View)", 40, 70, 120, 1, function(currentValue)
+    view = currentValue
+end)
+localview:AddToggle("FOV Enabled", false, function(isToggled)
+    getgenv().fov = isToggled
+    task.spawn(function()
+        local status = game:GetService("RunService").RenderStepped:Connect(function()
+            if getgenv().fov then
+                camera.FieldOfView = view
+            end
+        end)
+
+        if not getgenv().fov then
+            
+            status:Disconnect()
+        end
+    end)
+end)
+
+
+
+local changer = vis:CreateSector("Model Changer", "right")
+
+local transpa_arms = 0.6
+changer:AddSlider("Red", 1, 120, 255, 1, function(currentValue)
+    clr12 = currentValue
+end)
+changer:AddSlider("Green", 1, 120, 255, 1, function(currentValue)
+    clr22 = currentValue
+end)
+changer:AddSlider("Blue", 1, 120, 255, 1, function(currentValue)
+    clr32 = currentValue
+end)
+
+changer:AddSlider("Transparency", 1, 50, 100, 1, function(currentValue)
+    clr32 = currentValue / 100
+end)
+
+changer:AddButton("Apply Colors", function()
+    
+    task.spawn(function()
+        for _, i in pairs(game:GetService("ReplicatedStorage").Viewmodels:GetDescendants()) do
+    
+            if i:IsA("Part") then
+                i.Color = Color3.fromRGB(clr12, clr22, clr32)
+                i.Transparency = transpa_arms
+            end
+            
+        end
+    end)
+end)
+
+local world = vis:CreateSector("World Modulation", "right")
+
+local oldbright = game.Lighting.Brightness
+local newbright = 0
+
+world:AddSlider("Modulation", 0, 0, 50, 1, function(currentValue)
+    newbright = currentValue
+end)
+world:AddToggle("Modulation", false, function(isToggled)
+    getgenv().modul = isToggled
+    task.spawn(function()
+        while task.wait() and getgenv().modul do
+            if game.Lighting and getgenv().modul then
+                game.Lighting.Brightness = newbright
+            end
+        end
+        if game.Lighting and not getgenv().modul then
+            game.Lighting.Brightness = oldbright
+        end
+    end)
+end)
+
+local impact = vis:CreateSector("Impacts", "left")
+
+local imp_clr1, imp_clr2, imp_clr3, size = Color3.fromRGB(), Color3.fromRGB(), Color3.fromRGB(), 0.25
+
+impact:AddSlider("Red", 0, 120, 255, 1, function(currentValue)
+    imp_clr1 = currentValue
+end)
+
+impact:AddSlider("Green", 0, 120, 255, 1, function(currentValue)
+    imp_clr2 = currentValue
+end)
+impact:AddSlider("Blue", 0, 120, 255, 1, function(currentValue)
+    imp_clr3 = currentValue
+end)
+impact:AddSlider("Size", 1, 25, 100, 1, function(currentValue)
+    size = currentValue / 100
+end)
+
+impact:AddToggle("Impacts", false, function(isToggled)
+    getgenv().impact = isToggled
+    local main_func = game.Workspace.Camera.Debris.DescendantAdded:Connect(function(obj)
+        if obj.Name == "Wood" or obj.Name == "Metal" or obj.Name == "Concrete" or obj.Name == "Dirt" then
+            if getgenv().impact then
+                local impact_self = Instance.new("Part", obj)
+                impact_self.Size = Vector3.new(size, size, size)
+                impact_self.Name = "ClientImpact"
+                impact_self.Anchored = true
+                impact_self.Position = obj.Position
+                impact_self.Color = Color3.fromRGB(imp_clr1, imp_clr2, imp_clr3)
+                impact_self.Material = "SmoothPlastic"
+
+                task.wait()
+
+                local visualizer = Instance.new("Highlight", impact_self)
+
+                visualizer.Name = "ImpactVisualize"
+
+                visualizer.FillColor = Color3.fromRGB(imp_clr1, imp_clr2, imp_clr3)
+            end
+        end
+    
+    end)
+    game:GetService("RunService").RenderStepped:Connect(function ()
+        if main_func.Connected and getgenv().impact then
+            return nil
+        elseif not main_func.Connected and getgenv().impact then
+            main_func = game.Workspace.Camera.Debris.DescendantAdded:Connect(function(obj)
+                if obj.Name == "Wood" or obj.Name == "Metal" or obj.Name == "Concrete" or obj.Name == "Dirt" then
+                    if getgenv().impact then
+                        local impact_self = Instance.new("Part", obj)
+                        impact_self.Size = Vector3.new(size, size, size)
+                        impact_self.Name = "ClientImpact"
+                        impact_self.Anchored = true
+                        impact_self.Position = obj.Position
+                        impact_self.Color = Color3.fromRGB(imp_clr1, imp_clr2, imp_clr3)
+                        impact_self.Material = "SmoothPlastic"
+
+                        task.wait()
+
+                        local visualizer = Instance.new("Highlight", impact_self)
+
+                        visualizer.Name = "ImpactVisualize"
+
+                        visualizer.FillColor = Color3.fromRGB(imp_clr1, imp_clr2, imp_clr3)
+                    end
+                end
+            end)
+        end
+    end)
+end)
+
+cfgs:CreateConfigSystem("left")
