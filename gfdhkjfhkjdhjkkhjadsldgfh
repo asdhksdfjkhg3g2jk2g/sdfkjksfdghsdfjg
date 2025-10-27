@@ -39,15 +39,15 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                     if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
                         
                         if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
-                            if getgenv().predict2 then
-                                prevpos_need = mouse.Hit.Position
-                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
-                            else
-                                prevpos_need = mouse.Hit.Position
-                                camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
-                            end
+                                
+                            prevpos_need = mouse.Hit.Position
+                            camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
+                            
                             if mouse.Target == i.Character.HeadHB then
                                 aiming_toggled = false
+                                if getgenv().predict then
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
+                                end
                                 task.spawn(function()
                                     if getgenv().forcestopping and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                                         for id = 0, 3 do
@@ -70,7 +70,6 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                 end)
                                 task.defer(function()
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
-                                    
                                 end)
                                 aiming_toggled = true
                             else
@@ -544,7 +543,7 @@ changer:AddSlider("Blue", 1, 120, 255, 1, function(currentValue)
 end)
 
 changer:AddSlider("Transparency", 1, 50, 100, 1, function(currentValue)
-    clr32 = currentValue / 100
+    transpa_arms = currentValue / 100
 end)
 
 changer:AddButton("Apply Colors", function()
