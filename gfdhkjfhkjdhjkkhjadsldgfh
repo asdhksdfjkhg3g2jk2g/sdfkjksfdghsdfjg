@@ -22,15 +22,6 @@ getgenv().backward = false
 getgenv().Pitch = false
 local toggle2 = true
 
-for i = 0, 3 do
-    
-    if getexecutorname() == "Xeno" or getexecutorname() == "Solara" or getexecutorname() == "Celery" then
-        plr:Kick("Our script doesn't work with your executor.")
-    end
-
-end
-
-
 local aim = rage:CreateSector("Aimbot", "right")
 
 local auto = rage:CreateSector("Automatic", "left")
