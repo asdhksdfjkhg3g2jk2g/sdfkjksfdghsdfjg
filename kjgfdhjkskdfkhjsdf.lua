@@ -1,26 +1,10 @@
-local Luxtl = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Luxware-UI-Library/main/Source.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))() --you can go into the github link and copy all of it and modify it for yourself.
+local Window = Library:CreateWindow("gamescript.rage V4", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
+local rage = Window:CreateTab("Ragebot")
+local antiaim = Window:CreateTab("Anti Aim")
+local vis = Window:CreateTab("Visuals")
+local cfgs = Window:CreateTab("Config")
 
-local Luxt = Luxtl.CreateWindow("gamescript.rage")
-
-local mainTab = Luxt:Tab("Ragebot")
-local aa = Luxt:Tab("Anti Hit")
-local vis = Luxt:Tab("Visuals")
-local vers = Luxt:Tab("Script Version")
-
-local ff = mainTab:Section("Noes")
-local ff3 = mainTab:Section("Aimbot")
-local ff2 = mainTab:Section("Weapons")
-local scale = mainTab:Section("Scale")
-local move = mainTab:Section("Movement")
-local chams = vis:Section("Chams")
-local world = vis:Section("World")
-local impacts_sect = vis:Section("Impacts")
-local trace = vis:Section("Tracers")
-local model_changer = vis:Section("Model Changer")
-local player = vis:Section("Player")
-local aa1 = aa:Section("Fakelag")
-local aa2 = aa:Section("Main")
-local info = vers:Section("Script Information")
 local plr = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local mouse = plr:GetMouse()
@@ -38,8 +22,10 @@ getgenv().backward = false
 getgenv().Pitch = false
 local toggle2 = true
 
-ff3:Toggle("Auto Fire", function(isToggled)
-    
+
+local aim = rage:CreateSector("Aimbot", "left")
+
+aim:AddToggle("Auto Shoot", false, function(isToggled)
     getgenv().firing = isToggled
     task.spawn(function()
         game:GetService("RunService").RenderStepped:Connect(function()
@@ -83,10 +69,9 @@ ff3:Toggle("Auto Fire", function(isToggled)
             end
         end)
     end)
-
 end)
-ff3:Toggle("Rage Aim", function(isToggled)
-    
+aim:AddToggle("Rage Aimbot", false, function(isToggled)
+
     getgenv().aim = isToggled
     mouse.Button1Up:Connect(function()
         task.wait(0.3)
@@ -128,9 +113,10 @@ ff3:Toggle("Rage Aim", function(isToggled)
         	end
         end)
     end)
+
 end)
-ff3:Toggle("Camera at Opponent", function(isToggled)
-    
+
+aim:AddToggle("Camera at Opponent", false, function(isToggled)
     getgenv().atp = isToggled
     
     task.spawn(function()
@@ -158,18 +144,168 @@ ff3:Toggle("Camera at Opponent", function(isToggled)
             camera.CameraType = Enum.CameraType.Custom
         end
     end)
-
 end)
-ff3:Toggle("Prediction", function(isToggled)
-    
+
+aim:AddToggle("Prediction", false, function(isToggled)
     getgenv().predict = isToggled
-
 end)
-ff3:Slider("Prediction Power", 1, 35, function(currentValue)
+aim:AddSlider("Prediction Value", 1, 5, 35, 1, function(currentValue)
     predict_power = currentValue / 100
 end)
 
-aa2:Toggle("Void Sync", function(isToggled)
+local remov = rage:CreateSector("Noes", "right")
+
+remov:AddButton("No Spread", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "Spread" or i.Name == "Crouch" and i.Name == "Fire" or i.Name == "InitialJump" or i.Name == "Jump" or i.Name == "Ladder" or i.Name == "Land" or i.Name == "Move" or i.Name == "Recoil" or i.Name == "RecoveryTime" or i.Name == "Stand" then
+            i.Value = 0
+        end
+        
+    end
+end)
+remov:AddButton("No Fire Rate", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "FireRate" then
+            i.Value = 0
+        end
+        
+    end
+end)
+
+local scale = rage:CreateSector("Scale", "left")
+
+scale:AddSlider("Head Scale", 1, 10, 20, 1, function(currentValue)
+    for _, i in pairs(game.Players:GetPlayers()) do
+        if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("HeadHB") then
+            print(currentValue)
+            size = currentValue
+            i.Character.HeadHB.Size = Vector3.new(currentValue, currentValue, currentValue)
+            i.Character.HeadHB.OriginalSize.Value = Vector3.new(currentValue, currentValue, currentValue)
+            i.Character.Hat2.Handle.Size = Vector3.new(currentValue, currentValue, currentValue)
+        end
+    end
+end)
+scale:AddButton("Apply", function()
+    for _, i in pairs(game.Players:GetPlayers()) do
+        if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("HeadHB") and i.Character:FindFirstChild("Hat2") then
+            print("Applied")
+            i.Character.HeadHB.Size = Vector3.new(size, size, size)
+            i.Character.HeadHB.OriginalSize.Value = Vector3.new(size, size, size)
+            i.Character.Hat2.Handle.Size = Vector3.new(size, size, size)
+        end
+    end
+    game.DescendantAdded:Connect(function(i)
+        if i.Name == "HeadHB" then
+            task.wait()
+            i.Size = Vector3.new(size, size, size)
+        end
+    end)
+end)
+
+
+local weapon = rage:CreateSector("Weapon Changers", "right")
+
+weapon:AddButton("Infinite Ammo", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "Ammo" or i.Name == "StoredAmmo" then
+            i.Value = 10000000
+        end
+        
+    end
+end)
+weapon:AddButton("Wallbang", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "Penetration" or i.Name == "ArmorPenetration" then
+            i.Value = 10000000
+        end
+        
+    end
+end)
+weapon:AddButton("No Reload Rate", function()
+    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
+        
+        if i.Name == "ReloadTime" then
+            i.Value = 0.01
+        end
+        
+    end
+end)
+local move = rage:CreateSector("Movement", "left")
+move:AddButton("Remove Fall Damage", function()
+    if game:GetService("ReplicatedStorage").Events:FindFirstChild("FallDamage") then
+        game:GetService("ReplicatedStorage").Events.FallDamage:Destroy()
+    end
+end)
+move:AddToggle("Bunny Hop", false, function(isToggled)
+    print(isToggled)
+    getgenv().bhop = isToggled
+    local bhopping_status = game:GetService("RunService").RenderStepped:Connect(function()
+        if getgenv().bhop and inp:IsKeyDown(Enum.KeyCode.Space) and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Running then
+            
+            plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            
+        end
+    end)
+    if not getgenv().bhop then
+        bhopping_status:Disconnect()
+    end
+end)
+local sped = 1
+move:AddToggle("Auto Strafer", false, function(isToggled)
+    print(isToggled)
+    getgenv().strafer = isToggled
+    local strafer_self = game:GetService("RunService").RenderStepped:Connect(function()
+    
+        if getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped  
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
+            task.wait(0.8)
+
+            ----------
+
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped  
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped
+            task.wait(0.8)
+        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
+            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
+            task.wait(0.8)
+        end
+        
+        if getgenv().strafer and plr.Character and inp:IsKeyDown("Space") and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
+        end
+    
+    end)
+    if not getgenv().strafer then
+        strafer_self:Disconnect()
+    end
+end)
+move:AddSlider("Boost Strafe", 1, 200, 650, 1, function(currentValue)
+    sped = currentValue
+end)
+
+local desync = antiaim:CreateSector("Desync", "right")
+local aa_plr = antiaim:CreateSector("Player", "left")
+
+aa_plr:AddToggle("Void Sync", false, function(isToggled)
     getgenv().voidsync = isToggled
     task.spawn(function()
         while task.wait() and getgenv().voidsync do
@@ -184,8 +320,7 @@ aa2:Toggle("Void Sync", function(isToggled)
     end)
 end)
 
-
-aa1:Toggle("Fakelag Desync", function(isToggled)
+desync:AddToggle("Fakelag Desync", false, function(isToggled)
     getgenv().flag = isToggled
 	game:GetService("RunService").PostSimulation:Connect(function()
         if getgenv().flag and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
@@ -200,7 +335,8 @@ local toggle1 = true
 local delay = 0.05
 local main_camera
 getgenv().jitter = false
-aa2:Toggle("Backward", function(isToggled)
+
+aa_plr:AddToggle("Backward", false, function(isToggled)
     getgenv().backward = isToggled
     
     local enabla = game:GetService("RunService").RenderStepped:Connect(function ()
@@ -216,7 +352,7 @@ aa2:Toggle("Backward", function(isToggled)
     end
 end)
 
-aa2:Toggle("Head Jitter", function(isToggled)
+aa_plr:AddToggle("Head Jitter", false, function(isToggled)
     getgenv().jitter = isToggled
     task.spawn(function()
         while task.wait() and getgenv().jitter do
@@ -258,89 +394,34 @@ aa2:Toggle("Head Jitter", function(isToggled)
     elseif not getgenv().jitter then
         talbe.__namecall = old
     end
-
 end)
-aa2:Slider("Delay", 1, 20, function(currentValue)
+
+aa_plr:AddSlider("Delay", 1, 10, 20, 1, function(currentValue)
     delay = currentValue
 end)
 
-
-
-
-ff:Button("No Spread", function()
-    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
-        
-        if i.Name == "Spread" or i.Name == "Crouch" and i.Name == "Fire" or i.Name == "InitialJump" or i.Name == "Jump" or i.Name == "Ladder" or i.Name == "Land" or i.Name == "Move" or i.Name == "Recoil" or i.Name == "RecoveryTime" or i.Name == "Stand" then
-            i.Value = 0
-        end
-        
-    end
-end)
-ff:Button("No Fire Rate", function()
-    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
-        
-        if i.Name == "FireRate" then
-            i.Value = 0
-        end
-        
-    end
-end)
-ff2:Button("Inf Ammo", function()
-    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
-        
-        if i.Name == "Ammo" or i.Name == "StoredAmmo" then
-            i.Value = 10000000
-        end
-        
-    end
-end)
-ff2:Button("Wall bang", function()
-    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
-        
-        if i.Name == "Penetration" or i.Name == "ArmorPenetration" then
-            i.Value = 10000000
-        end
-        
-    end
-end)
-ff2:Button("Instant Reload", function()
-    for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
-        
-        if i.Name == "ReloadTime" then
-            i.Value = 0.01
-        end
-        
-    end
-end)
-local size = 1
-scale:Slider("Head Scale", 1, 20, function(currentValue)
-    for _, i in pairs(game.Players:GetPlayers()) do
-        if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("HeadHB") then
-            print(currentValue)
-            size = currentValue
-            i.Character.HeadHB.Size = Vector3.new(currentValue, currentValue, currentValue)
-            i.Character.HeadHB.OriginalSize.Value = Vector3.new(currentValue, currentValue, currentValue)
-            i.Character.Hat2.Handle.Size = Vector3.new(currentValue, currentValue, currentValue)
-        end
-    end
-end)
-local clr1, clr2, clr3 = 255, 255, 255
+local clr1, clr, clr2, clr3 = 255, 255, 255
 local clr12, clr22, clr32 = 255, 255, 255
 local transpa_chams = 0.6
-chams:Slider("Color Red", 1, 255, function(currentValue)
+
+local chams = vis:CreateSector("Chams", "left")
+
+chams:AddSlider("Red", 1, 150, 255, 1, function(currentValue)
     clr = currentValue
 end)
-chams:Slider("Color Green", 1, 255, function(currentValue)
+chams:AddSlider("Green", 1, 150, 255, 1, function(currentValue)
     clr2 = currentValue
 end)
-chams:Slider("Color Blue", 1, 255, function(currentValue)
+chams:AddSlider("Blue", 1, 150, 255, 1, function(currentValue)
     clr3 = currentValue
 end)
-chams:Slider("Transparency", 1, 100, function(currentValue)
+
+chams:AddSlider("Transparency", 1, 10, 100, 1, function(currentValue)
     transpa_chams = currentValue / 100
 end)
-chams:Toggle("Chams", function(isToggled)
-    print(isToggled)
+
+chams:AddToggle("Chams", false, function(isToggled) 
+
     getgenv().esp = isToggled
     for _, i in pairs(game.Players:GetPlayers()) do
         if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("UpperTorso") and getgenv().esp and i.Status.Team.Value ~= plr.Status.Team.Value then
@@ -369,7 +450,8 @@ chams:Toggle("Chams", function(isToggled)
     end
 
 end)
-chams:Button("Apply Changes", function()
+
+chams:AddButton("Apply Changes", function()
     for _, i in pairs(game.Workspace:GetDescendants()) do
         if i.Name == "BOXESP" and i:IsA("Highlight") then
             i.FillColor = Color3.fromRGB(clr, clr2, clr3)
@@ -377,11 +459,11 @@ chams:Button("Apply Changes", function()
         end
     end
 end)
+
+local localview = vis:CreateSector("Local", "Right")
 local dist = 45
-player:Slider("Max Distance", 16, 100, function(currentValue)
-    dist = currentValue
-end)
-player:Toggle("Third Person", function(isToggled)
+
+localview:AddToggle("Third Person", false, function(isToggled)
     getgenv().third = isToggled
     local third_status = game:GetService("RunService").RenderStepped:Connect(function()
         if getgenv().third then
@@ -395,11 +477,15 @@ player:Toggle("Third Person", function(isToggled)
     end
     
 end)
-local view = 70
-player:Slider("Field of View (FOV)", 40, 100, function(currentValue)
+localview:AddSlider("ThirdPerson Distance", 16, 50, 100, 1, function(currentValue)
+    dist = currentValue
+end)
+local fov = 70
+
+localview:AddSlider("FOV (Field of View)", 40, 70, 120, 1, function(currentValue)
     view = currentValue
 end)
-player:Toggle("FOV Enabled", function(isToggled)
+localview:AddToggle("FOV Enabled", false, function(isToggled)
     getgenv().fov = isToggled
     task.spawn(function()
         local status = game:GetService("RunService").RenderStepped:Connect(function()
@@ -414,20 +500,27 @@ player:Toggle("FOV Enabled", function(isToggled)
         end
     end)
 end)
+
+
+
+local changer = vis:CreateSector("Model Changer", "right")
+
 local transpa_arms = 0.6
-model_changer:Slider("Color Red", 1, 255, function(currentValue)
+changer:AddSlider("Red", 1, 120, 255, 1, function(currentValue)
     clr12 = currentValue
 end)
-model_changer:Slider("Color Green", 1, 255, function(currentValue)
+changer:AddSlider("Green", 1, 120, 255, 1, function(currentValue)
     clr22 = currentValue
 end)
-model_changer:Slider("Color Blue", 1, 255, function(currentValue)
+changer:AddSlider("Blue", 1, 120, 255, 1, function(currentValue)
     clr32 = currentValue
 end)
-model_changer:Slider("Transparency", 1, 100, function(currentValue)
-    transpa_arms = currentValue / 100
+
+changer:AddSlider("Transparency", 1, 50, 100, 1, function(currentValue)
+    clr32 = currentValue / 100
 end)
-model_changer:Button("Apply Arms's Colors", function()
+
+changer:AddButton("Apply Colors", function()
     
     task.spawn(function()
         for _, i in pairs(game:GetService("ReplicatedStorage").Viewmodels:GetDescendants()) do
@@ -438,45 +531,18 @@ model_changer:Button("Apply Arms's Colors", function()
             end
             
         end
-    
     end)
-end)
-model_changer:Toggle("Arms ESP", function(isToggled)
-    getgenv().armSP = isToggled
-    task.spawn(function()
-        while task.wait() and getgenv().armSP do
-            if workspace.Camera:FindFirstChild("Arms") and not workspace.Camera.Arms:FindFirstChild("Arms_ESP") then
-                local armESP = Instance.new("Highlight", workspace.Camera:FindFirstChild("Arms"))
-                armESP.Name = "Arms_ESP"
-                armESP.FillColor = Color3.fromRGB(clr12, clr22, clr32)
-                armESP.FillTransparency = transpa_arms
-            end
-        end
-    end)
-end)
-scale:Button("Apply", function()
-    for _, i in pairs(game.Players:GetPlayers()) do
-        if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("HeadHB") and i.Character:FindFirstChild("Hat2") then
-            print("Applied")
-            i.Character.HeadHB.Size = Vector3.new(size, size, size)
-            i.Character.HeadHB.OriginalSize.Value = Vector3.new(size, size, size)
-            i.Character.Hat2.Handle.Size = Vector3.new(size, size, size)
-        end
-    end
-    game.DescendantAdded:Connect(function(i)
-        if i.Name == "HeadHB" then
-            task.wait()
-            i.Size = Vector3.new(size, size, size)
-        end
-    end)
-end)
-local oldbright = game.Lighting.Brightness
-local newbright = game.Lighting.Brightness
-world:Slider("Modulation", 0, 50, function(currentValue)
-    newbright = currentValue
 end)
 
-world:Toggle("Modulation", function(isToggled)
+local world = vis:CreateSector("World Modulation", "right")
+
+local oldbright = game.Lighting.Brightness
+local newbright = 0
+
+world:AddSlider("Modulation", 0, 0, 50, 1, function(currentValue)
+    newbright = currentValue
+end)
+world:AddToggle("Modulation", false, function(isToggled)
     getgenv().modul = isToggled
     task.spawn(function()
         while task.wait() and getgenv().modul do
@@ -489,49 +555,26 @@ world:Toggle("Modulation", function(isToggled)
         end
     end)
 end)
-local fog_modulation = game:GetService("Lighting").FogEnd
-world:Slider("Fog Modulation", 0, 90, function(currentValue)
-    if currentValue > 80 then
-        fog_modulation = 1000
-    else
-        fog_modulation = currentValue
-    end
-end)
-world:Toggle("Fog", function(isToggled)
-    getgenv().fogmod = isToggled
-    task.spawn(function()
-        while getgenv().fogmod and task.wait(0.001) do
-            game:GetService("Lighting").FogEnd = fog_modulation
-        end
-    end)
-end)
-local lifetime, length = 1, 1000
-trace:Slider("Bullet Tracers Lifetime", 0, 10, function(currentValue)
-    lifetime = currentValue
-end)
-trace:Slider("Max Length", 0, 1000, function(currentValue)
-    length = currentValue
-end)
-trace:Button("Bullet Tracers Apply", function()
-    game:GetService("ReplicatedStorage").VisualizeModule.Trail.Lifetime = lifetime
-    game:GetService("ReplicatedStorage").VisualizeModule.Trail.MaxLength = length
-end)
-local size = 0.25
-local imp_clr1, imp_clr2, imp_clr3 = Color3.fromRGB(), Color3.fromRGB(), Color3.fromRGB()
 
-impacts_sect:Slider("Color Red", 0, 255, function(currentValue)
+local impact = vis:CreateSector("Impacts", "left")
+
+local imp_clr1, imp_clr2, imp_clr3, size = Color3.fromRGB(), Color3.fromRGB(), Color3.fromRGB(), 0.25
+
+impact:AddSlider("Red", 0, 120, 255, 1, function(currentValue)
     imp_clr1 = currentValue
 end)
-impacts_sect:Slider("Color Green", 0, 255, function(currentValue)
+
+impact:AddSlider("Green", 0, 120, 255, 1, function(currentValue)
     imp_clr2 = currentValue
 end)
-impacts_sect:Slider("Color Blue", 0, 255, function(currentValue)
+impact:AddSlider("Blue", 0, 120, 255, 1, function(currentValue)
     imp_clr3 = currentValue
 end)
-impacts_sect:Slider("Size", 0, 50, function(currentValue)
+impact:AddSlider("Size", 1, 25, 100, 1, function(currentValue)
     size = currentValue / 100
 end)
-impacts_sect:Toggle("Impacts", function(isToggled)
+
+impact:AddToggle("Impacts", false, function(isToggled)
     getgenv().impact = isToggled
     local main_func = game.Workspace.Camera.Debris.DescendantAdded:Connect(function(obj)
         if obj.Name == "Wood" or obj.Name == "Metal" or obj.Name == "Concrete" or obj.Name == "Dirt" then
@@ -584,77 +627,4 @@ impacts_sect:Toggle("Impacts", function(isToggled)
     end)
 end)
 
-move:Button("Remove Fall Damage", function()
-    if game:GetService("ReplicatedStorage").Events:FindFirstChild("FallDamage") then
-        game:GetService("ReplicatedStorage").Events.FallDamage:Destroy()
-    end
-end)
-move:Toggle("Bunny Hop", function(isToggled)
-    print(isToggled)
-    getgenv().bhop = isToggled
-    local bhopping_status = game:GetService("RunService").RenderStepped:Connect(function()
-        if getgenv().bhop and inp:IsKeyDown(Enum.KeyCode.Space) and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Running then
-            
-            plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            
-        end
-    end)
-    if not getgenv().bhop then
-        bhopping_status:Disconnect()
-    end
-end)
-local sped = 1
-move:Toggle("Auto Strafer", function(isToggled)
-    print(isToggled)
-    getgenv().strafer = isToggled
-    local strafer_self = game:GetService("RunService").RenderStepped:Connect(function()
-    
-        if getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped  
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.RightVector * 0.001 * sped
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and not getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -plr.Character.HumanoidRootPart.CFrame.LookVector * 0.001 * sped
-            task.wait(0.8)
-
-            ----------
-
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped  
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.RightVector) * 0.001 * sped
-            task.wait(0.8)
-        elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and getgenv().backward then
-            plr.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + -(-plr.Character.HumanoidRootPart.CFrame.LookVector) * 0.001 * sped
-            task.wait(0.8)
-        end
-        
-        if getgenv().strafer and plr.Character and inp:IsKeyDown("Space") and plr.Character:FindFirstChild("HumanoidRootPart") then
-            plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
-        end
-    
-    end)
-    if not getgenv().strafer then
-        strafer_self:Disconnect()
-    end
-end)
-move:Slider("Strafe Speed", 1, 650, function(currentValue)
-    sped = currentValue
-end)
-
-info:Label("Version: ENCODE #1")
-info:Label("Developed by steel_the_developer (discord)")
-info:Label("Discord Forum : https://discord.gg/E5Tt4yYYMr")
-info:Button("Copy", function()
-    setclipboard("https://discord.gg/E5Tt4yYYMr")
-end)
-info:Label("gamescript: rage version")
+cfgs:CreateConfigSystem("left")
