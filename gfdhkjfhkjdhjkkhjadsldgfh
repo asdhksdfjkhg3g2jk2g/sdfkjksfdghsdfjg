@@ -36,7 +36,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
         game:GetService("RunService").RenderStepped:Connect(function()
 
             for _, i in pairs(game.Players:GetPlayers()) do
-                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default and aiming_toggled and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health ~= 0 then
+                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default and aiming_toggled and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health ~= 0 and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                     if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
                         
                         if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
@@ -44,7 +44,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                             prevpos_need = mouse.Hit.Position
                             camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                             
-                            if mouse.Target == i.Character.HeadHB or mouse.Target.Name == "BuyArena" or mouse.Target.Name == "BuyArena2" then
+                            if mouse.Target == i.Character.HeadHB or mouse.Target.Name == "BuyArena" or mouse.Target.Name == "BuyArena2" or mouse.Target.Parent.Name == plr.Name then
                                 aiming_toggled = false
                                 if getgenv().predict then
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
@@ -53,7 +53,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                 end
                                 task.spawn(function()
                                     if getgenv().forcestopping and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                                        for id = 0, 7 do
+                                        for id = 0, 9 do
                                             if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                                                 plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
                                             end
@@ -245,7 +245,7 @@ weapon:AddButton("Infinite Ammo", function()
         
     end
 end)
-weapon:AddButton("Wallbang", function()
+weapon:AddButton("Penetration", function()
     for _, i in pairs(game:GetService("ReplicatedStorage").Weapons:GetDescendants()) do
         
         if i.Name == "Penetration" or i.Name == "ArmorPenetration" then
@@ -268,6 +268,29 @@ move:AddButton("Remove Fall Damage", function()
     if game:GetService("ReplicatedStorage").Events:FindFirstChild("FallDamage") then
         game:GetService("ReplicatedStorage").Events.FallDamage:Destroy()
     end
+end)
+local cam = rage:CreateSector("Camera", "right")
+local cam_height = 2.5
+cam:AddToggle("Duck Up", false, function(isToggled)
+    
+    getgenv().ignore = isToggled
+
+    local active = game:GetService("RunService").RenderStepped:Connect(function ()
+
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) then
+            
+            camera.CFrame += Vector3.new(0, cam_height, 0)
+
+        end
+    end)
+
+    if getgenv().ignore then
+        active:Disconnect()
+    end
+    
+end)
+cam:AddSlider("Height", 1, 5, 10, 1, function(currentValue)
+    cam_height = currentValue
 end)
 move:AddToggle("Bunny Hop", false, function(isToggled)
     
@@ -527,11 +550,13 @@ end)
 
 local localview = vis:CreateSector("Local", "Right")
 local dist = 45
-
+local height = 0
 localview:AddToggle("Third Person", false, function(isToggled)
     getgenv().third = isToggled
     local third_status = game:GetService("RunService").RenderStepped:Connect(function()
         if getgenv().third then
+            camera = workspace.CurrentCamera
+            camera.CFrame += Vector3.new(0, height, 0)
             plr.CameraMaxZoomDistance = dist
         else
             plr.CameraMaxZoomDistance = 0
@@ -544,6 +569,9 @@ localview:AddToggle("Third Person", false, function(isToggled)
 end)
 localview:AddSlider("ThirdPerson Distance", 16, 50, 100, 1, function(currentValue)
     dist = currentValue
+end)
+localview:AddSlider("ThirdPerson Height", 1, 50, 5000, 1, function(currentValue)
+    height = currentValue / 1000
 end)
 local fov = 70
 
