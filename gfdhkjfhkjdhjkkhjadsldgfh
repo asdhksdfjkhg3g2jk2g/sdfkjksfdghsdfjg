@@ -37,6 +37,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                         if i.Character and i.Character:FindFirstChild("HeadHB") and i.Character:FindFirstChild("Head") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value then
                                 
                             prevpos_need = mouse.Hit.Position
+                            mouse = plr:GetMouse()
                             camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                             
                             if mouse.Target == i.Character.HeadHB or mouse.Target == i.Character.Head or mouse.Target.Parent.Name == plr.Name then
