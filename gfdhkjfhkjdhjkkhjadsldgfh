@@ -36,12 +36,12 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                 if getgenv().firing and aiming_toggled and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health ~= 0 and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                     if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
                         
-                        if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
+                        if i.Character and i.Character:FindFirstChild("HeadHB") and i.Character:FindFirstChild("Head") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
                                 
                             prevpos_need = mouse.Hit.Position
                             camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                             
-                            if mouse.Target == i.Character.HeadHB or mouse.Target.Parent.Name == plr.Name then
+                            if mouse.Target == i.Character.HeadHB or mouse.Target == i.Character.Head or mouse.Target.Parent.Name == plr.Name then
                                 aiming_toggled = false
                                 if getgenv().predict then
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
