@@ -19,7 +19,7 @@ local Virtual = game:GetService("VirtualInputManager")
 local aiming_toggled = true
 local inp = game:GetService("UserInputService")
 getgenv().backward = false
-getgenv().Pitch = false
+
 local toggle2 = true
 
 local aim = rage:CreateSector("Aimbot", "right")
@@ -118,19 +118,13 @@ aim:AddToggle("Rage Aimbot", false, function(isToggled)
                                 prevplrpos = magnited
                                 if is and is.Character and is.Character:FindFirstChild("HumanoidRootPart") then
                                     if getgenv().predict then
-                                        task.spawn(function()
-                                            toggle2 = false
-                                            task.wait(0.09)
-                                            toggle2 = true
-                                        end)
+                                        
                                         camera.CFrame = CFrame.lookAt(camera.CFrame.Position, is.Character.HeadHB.Position + is.Character.HeadHB.Velocity * predict_power)
                                         game:GetService("RunService").RenderStepped:Wait()
                                         break
                                     else
-                                        getgenv().Pitch = false
                                         camera.CFrame = CFrame.lookAt(camera.CFrame.Position, is.Character.HeadHB.Position)
                                         game:GetService("RunService").RenderStepped:Wait()
-                                        getgenv().Pitch = true
                                     end
                                 end
                             elseif magnited > prevplrpos then
@@ -271,20 +265,21 @@ move:AddButton("Remove Fall Damage", function()
 end)
 local cam = rage:CreateSector("Camera", "right")
 local cam_height = 2.5
+local camera_ignore = workspace.CurrentCamera
 cam:AddToggle("Duck Up", false, function(isToggled)
     
     getgenv().ignore = isToggled
 
     local active = game:GetService("RunService").RenderStepped:Connect(function ()
 
-        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) then
-            
-            camera.CFrame += Vector3.new(0, cam_height, 0)
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) and getgenv().ignore then
+            camera_ignore = workspace.CurrentCamera
+            camera_ignore.CFrame += Vector3.new(0, cam_height, 0)
 
         end
     end)
 
-    if getgenv().ignore then
+    if not getgenv().ignore then
         active:Disconnect()
     end
     
