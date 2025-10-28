@@ -31,6 +31,7 @@ getgenv().forcestopping = false
 getgenv().jit = false
 auto:AddToggle("Auto Shoot", false, function(isToggled)
     getgenv().firing = isToggled
+
     task.spawn(function()
         game:GetService("RunService").RenderStepped:Connect(function()
 
@@ -207,7 +208,7 @@ local scale = rage:CreateSector("Scale", "left")
 scale:AddSlider("Head Scale", 1, 10, 20, 1, function(currentValue)
     for _, i in pairs(game.Players:GetPlayers()) do
         if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("HeadHB") then
-            print(currentValue)
+            
             size = currentValue
             i.Character.HeadHB.Size = Vector3.new(currentValue, currentValue, currentValue)
             i.Character.HeadHB.OriginalSize.Value = Vector3.new(currentValue, currentValue, currentValue)
@@ -218,7 +219,7 @@ end)
 scale:AddButton("Apply", function()
     for _, i in pairs(game.Players:GetPlayers()) do
         if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("HeadHB") and i.Character:FindFirstChild("Hat2") then
-            print("Applied")
+            
             i.Character.HeadHB.Size = Vector3.new(size, size, size)
             i.Character.HeadHB.OriginalSize.Value = Vector3.new(size, size, size)
             i.Character.Hat2.Handle.Size = Vector3.new(size, size, size)
@@ -269,7 +270,7 @@ move:AddButton("Remove Fall Damage", function()
     end
 end)
 move:AddToggle("Bunny Hop", false, function(isToggled)
-    print(isToggled)
+    
     getgenv().bhop = isToggled
     local bhopping_status = game:GetService("RunService").RenderStepped:Connect(function()
         if getgenv().bhop and inp:IsKeyDown(Enum.KeyCode.Space) and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Running then
@@ -285,7 +286,7 @@ end)
 local sped = 1
 local camera_forstrafe
 move:AddToggle("Auto Strafer", false, function(isToggled)
-    print(isToggled)
+    
     getgenv().strafer = isToggled
     task.spawn(function()
         while task.wait() and getgenv().strafer do
@@ -407,7 +408,6 @@ aa_plr:AddToggle("Pitch Down", false, function(isToggled)
         table_down.__namecall = function(self, ...)
             local main_args = {...}
             if getnamecallmethod() == "FireServer" and not checkcaller() and toggle1 and getgenv().down and table.find(main_args, false) then
-                print("Downed")
                 return old(self, unpack({-0.9, false}))
             end
             return old(self, ...)
@@ -490,24 +490,24 @@ chams:AddToggle("Chams", false, function(isToggled)
     getgenv().esp = isToggled
     for _, i in pairs(game.Players:GetPlayers()) do
         if i.Name ~= plr.Name and i.Character ~= nil and i.Character:FindFirstChild("UpperTorso") and getgenv().esp and i.Status.Team.Value ~= plr.Status.Team.Value then
-            print(1)
+            
             local Instanc = Instance.new("Highlight", i.Character)
             Instanc.Name = "BOXESP"
             Instanc.FillColor = Color3.fromRGB(clr, clr2, clr3)
             Instanc.FillTransparency = transpa_chams
-            print(2)
+            
         elseif not getgenv().esp and i.Character and i.Character:FindFirstChild("BOXESP") then
             i.Character.BOXESP:Destroy()
         end
     end
     local descendants_hooking = game.DescendantAdded:Connect(function(i)
         if getgenv().esp and i:IsA("Model") and game.Players:FindFirstChild(i.Name) and game.Players:FindFirstChild(i.Name) and game.Players:FindFirstChild(i.Name).Status.Team.Value ~= plr.Status.Team.Value then
-            print(1)
+            
             local Instanc = Instance.new("Highlight", i)
             Instanc.Name = "BOXESP"
             Instanc.FillColor = Color3.fromRGB(clr, clr2, clr3)
             Instanc.FillTransparency = transpa_chams
-            print(2)
+           
         end
     end)
     if not getgenv().esp then
