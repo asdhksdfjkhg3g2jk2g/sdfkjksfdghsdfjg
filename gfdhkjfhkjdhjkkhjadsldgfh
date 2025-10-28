@@ -43,10 +43,12 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                             prevpos_need = mouse.Hit.Position
                             camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                             
-                            if mouse.Target == i.Character.HeadHB then
+                            if mouse.Target == i.Character.HeadHB or mouse.Target.Name == "BuyArena" or mouse.Target.Name == "BuyArena2" then
                                 aiming_toggled = false
                                 if getgenv().predict then
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
+                                else
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                                 end
                                 task.spawn(function()
                                     if getgenv().forcestopping and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
@@ -65,7 +67,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                 end)
                                 task.spawn(function()
                                     Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
-                                    task.wait(0.03)
+                                    task.wait(0.005)
                                     Virtual:SendMouseButtonEvent(10, 10, 0, false, game.Workspace, 0)
                                 end)
                                 task.defer(function()
