@@ -52,7 +52,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                 end
                                 task.spawn(function()
                                     if getgenv().forcestopping and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                                        for id = 0, 3 do
+                                        for id = 0, 7 do
                                             if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                                                 plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
                                             end
@@ -67,7 +67,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                 end)
                                 task.spawn(function()
                                     Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
-                                    task.wait(0.005)
+                                    task.wait(0.01)
                                     Virtual:SendMouseButtonEvent(10, 10, 0, false, game.Workspace, 0)
                                 end)
                                 task.defer(function()
