@@ -18,9 +18,6 @@ local prevpos_need = nil
 local Virtual = game:GetService("VirtualInputManager")
 local aiming_toggled = true
 local inp = game:GetService("UserInputService")
-getgenv().backward = false
-
-local toggle2 = true
 
 local aim = rage:CreateSector("Aimbot", "right")
 
@@ -36,7 +33,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
         game:GetService("RunService").RenderStepped:Connect(function()
 
             for _, i in pairs(game.Players:GetPlayers()) do
-                if getgenv().firing and game:GetService("UserInputService").MouseBehavior ~= Enum.MouseBehavior.Default and aiming_toggled and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health ~= 0 and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                if getgenv().firing and aiming_toggled and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health ~= 0 and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                     if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
                         
                         if i.Character and i.Character:FindFirstChild("HeadHB") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value and aiming_toggled then
@@ -44,7 +41,7 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                             prevpos_need = mouse.Hit.Position
                             camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                             
-                            if mouse.Target == i.Character.HeadHB or mouse.Target.Name == "BuyArena" or mouse.Target.Name == "BuyArena2" or mouse.Target.Parent.Name == plr.Name then
+                            if mouse.Target == i.Character.HeadHB or mouse.Target.Parent.Name == plr.Name then
                                 aiming_toggled = false
                                 if getgenv().predict then
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
@@ -53,18 +50,13 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                 end
                                 task.spawn(function()
                                     if getgenv().forcestopping and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                                        for id = 0, 9 do
+                                        for id = 0, 130 do
                                             if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                                                 plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
                                             end
-                                            task.wait(0.08)
+                                            task.wait(0.008)
                                         end
                                     end
-                                end)
-                                task.spawn(function()
-                                    toggle2 = false
-                                    task.wait(0.09)
-                                    toggle2 = true
                                 end)
                                 task.spawn(function()
                                     Virtual:SendMouseButtonEvent(10, 10, 0, true, game.Workspace, 0)
