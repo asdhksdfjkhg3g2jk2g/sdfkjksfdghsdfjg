@@ -207,11 +207,11 @@ auto:AddToggle("Report misses (F9)", false, function(isToggled)
                         damage2 = game:GetService("Players").LocalPlayer.Additionals.TotalDamage.Value
                         
                         if damage2 == damage and game:GetService("ReplicatedStorage").Weapons.Glock.Spread.Value == 0 then
-                            print("Missed shot due to Unregistered shot")
+                            warn("Missed shot due to Unregistered shot")
                             before_shooting = false
                             after_shooting = false
                         elseif damage2 == damage then
-                            print("Missed shot due to Spread")
+                            warn("Missed shot due to Spread")
                             before_shooting = false
                             after_shooting = false
                         else
