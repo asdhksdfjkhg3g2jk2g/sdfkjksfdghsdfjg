@@ -1,8 +1,9 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))() --you can go into the github link and copy all of it and modify it for yourself.
-local Window = Library:CreateWindow("gamescript.rage V4.4", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
+local Window = Library:CreateWindow("gamescript.rage V5", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
 local rage = Window:CreateTab("Ragebot")
 local antiaim = Window:CreateTab("Anti Aim")
 local vis = Window:CreateTab("Visuals")
+local misc = Window:CreateTab("Misc")
 local cfgs = Window:CreateTab("Config")
 
 local plr = game.Players.LocalPlayer
@@ -25,6 +26,11 @@ local predict_power2 = 0.15
 getgenv().predict2 = false
 getgenv().forcestopping = false
 getgenv().jit = false
+local hyper_distance = 20
+getgenv().hypertrack = false
+local penetrate_enabled = false
+local object_to_def = nil
+local before_shooting, after_shooting = false, false
 auto:AddToggle("Auto Shoot", false, function(isToggled)
     getgenv().firing = isToggled
 
@@ -35,12 +41,11 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                 if getgenv().firing and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health ~= 0 and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                     if i.Character and i.Character:FindFirstChild("HeadHB") and i.Name ~= plr.Name then
                         if i.Character and i.Character:FindFirstChild("HeadHB") and i.Character:FindFirstChild("Head") and camera:WorldToScreenPoint(i.Character.HeadHB.Position) and i.Status.Team.Value ~= plr.Status.Team.Value then
-                                
-                            prevpos_need = mouse.Hit.Position
                             mouse = plr:GetMouse()
+                            prevpos_need = mouse.Hit.Position
                             camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                             
-                            if mouse.Target == i.Character.HeadHB or mouse.Target == i.Character.Head or mouse.Target.Parent.Name == plr.Name then
+                            if mouse.Target == i.Character.HeadHB or mouse.Target == i.Character.Head or mouse.Target.Parent.Name == plr.Name and not penetrate_enabled then
                                 
                                 task.spawn(function()
                                     if getgenv().forcestopping and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
@@ -52,8 +57,10 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                         end
                                     end
                                 end)
+                                before_shooting = true
+                                object_to_def = i.Character.HeadHB
                                 if getgenv().predict then
-                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity)
                                 else
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                                 end
@@ -62,6 +69,36 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                     task.wait(0.003)
                                     Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, false, game.Workspace, 0)
                                 end)
+                                task.defer(function()
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
+                                end)
+                                after_shooting = true
+                                break
+                            elseif penetrate_enabled and (i.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude < 70 then
+                                task.spawn(function()
+                                    if getgenv().forcestopping and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                                        for id = 0, 90 do
+                                            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                                                plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+                                            end
+                                            task.wait(0.0008)
+                                        end
+                                    end
+                                end)
+                                before_shooting = true
+                                if getgenv().predict then
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
+                                else
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
+                                end
+                                task.spawn(function()
+                                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, true, game.Workspace, 0)
+                                    after_shooting = true
+                                    task.wait(0.003)
+                                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, false, game.Workspace, 0)
+                                    
+                                end)
+                                
                                 task.defer(function()
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
                                 end)
@@ -82,18 +119,113 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
         bind:Disconnect()
     end
 end)
+local damage, damage2 = nil, nil
+local ig = 0
+
+local mode_dt = "Default"
+local bullets = 2
+local double = rage:CreateSector("Double Tap", "Left")
+local toggled = true
+local warp_value = 5
+double:AddToggle("Tapping", false, function(isToggled)
+    getgenv().dt = isToggled
+    
+    local connection = mouse.Button1Down:Connect(function()    
+        if toggled then
+            toggled = false
+            if mode_dt == "Default" and getgenv().dt and not upped and plr.Character and plr.Character:FindFirstChild("Humanoid") then
+                for i = 1, bullets do
+                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, true, game.Workspace, 0)
+                    task.wait(0.006)
+                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, false, game.Workspace, 0)
+                    task.wait(0.006)
+                end
+                
+            elseif getgenv().dt and not upped and mode_dt == "Defensive Warp" and plr.Character and plr.Character:FindFirstChild("Humanoid") then
+                for i = 1, bullets do
+                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, true, game.Workspace, 0)
+                    task.wait(0.006)
+                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, false, game.Workspace, 0)
+                    task.wait(0.006)
+                end
+                if getgenv().dt and plr.Character and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
+                    camera_fordt = workspace.CurrentCamera
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(camera_fordt.CFrame.LookVector.X, 0, camera_fordt.CFrame.LookVector.Z) * warp_value)
+                elseif getgenv().dt  and plr.Character and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
+                    camera_fordt = workspace.CurrentCamera
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(camera_fordt.CFrame.RightVector.X, 0, camera_fordt.CFrame.RightVector.Z) * warp_value)
+                elseif getgenv().dt  and plr.Character and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
+                    camera_fordt = workspace.CurrentCamera
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(-camera_fordt.CFrame.RightVector.X, 0, -camera_fordt.CFrame.RightVector.Z) * warp_value)
+                elseif getgenv().dt  and plr.Character and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
+                    camera_fordt = workspace.CurrentCamera
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(-camera_fordt.CFrame.LookVector.X, 0, -camera_fordt.CFrame.LookVector.Z) * warp_value)
+                end
+            end
+            toggled = true
+        end
+    end)
+    
+    if not getgenv().dt then
+        connection:Disconnect()
+    end
+end)
+
+double:AddDropdown("Mode", {"Default", "Defensive Warp"}, "Default", false, function(dropdown)
+    mode_dt = dropdown
+end)
+double:AddSlider("Bullets", 1, 2, 10, 1, function(currentValue)
+    bullets = currentValue
+end)
+double:AddSlider("Warp Value", 1, 5, 10, 1, function(currentValue)
+    warp_value = currentValue
+end)
 
 auto:AddToggle("Prediction", false, function(isToggled)
     getgenv().predict2 = isToggled
-end)
-auto:AddSlider("Prediction Value", 1, 5, 35, 1, function(currentValue)
-    predict_power2 = currentValue / 100
 end)
 
 auto:AddToggle("Force Stop", false, function(isToggled)
     getgenv().forcestopping = isToggled
 end)
-
+auto:AddToggle("Report misses (F9)", false, function(isToggled)
+    getgenv().report = isToggled
+    task.spawn(function()
+        while task.wait() and getgenv().report do
+            
+            if getgenv().report then
+                
+                while game:GetService("RunService").RenderStepped:Wait() and not before_shooting do
+                end
+                if before_shooting then
+                    damage = game:GetService("Players").LocalPlayer.Additionals.TotalDamage.Value
+                    while game:GetService("RunService").RenderStepped:Wait() and not after_shooting do
+                    end
+                    damage2 = game:GetService("Players").LocalPlayer.Additionals.TotalDamage.Value
+                    if after_shooting then
+                        task.wait(1.3)
+                        damage2 = game:GetService("Players").LocalPlayer.Additionals.TotalDamage.Value
+                        
+                        if damage2 == damage and game:GetService("ReplicatedStorage").Weapons.Glock.Spread.Value == 0 then
+                            print("Missed shot due to Unregistered shot")
+                            before_shooting = false
+                            after_shooting = false
+                        elseif damage2 == damage then
+                            print("Missed shot due to Spread")
+                            before_shooting = false
+                            after_shooting = false
+                        else
+                            before_shooting = false
+                            after_shooting = false
+                        end
+                        
+                    end
+                end
+            end
+            
+        end
+    end)
+end)
 aim:AddToggle("Rage Aimbot", false, function(isToggled)
 
     getgenv().aim = isToggled
@@ -240,7 +372,7 @@ weapon:AddButton("Penetration", function()
         if i.Name == "Penetration" or i.Name == "ArmorPenetration" then
             i.Value = 10000000
         end
-        
+        penetrate_enabled = true
     end
 end)
 weapon:AddButton("No Reload Rate", function()
@@ -261,7 +393,7 @@ end)
 local cam = rage:CreateSector("Camera", "right")
 local cam_height = 2.5
 local camera_ignore = workspace.CurrentCamera
-cam:AddToggle("Duck Up", false, function(isToggled)
+cam:AddToggle("Camera Duck", false, function(isToggled)
     
     getgenv().ignore = isToggled
 
@@ -307,17 +439,19 @@ move:AddToggle("Auto Strafer", false, function(isToggled)
             if getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
                 camera_forstrafe = workspace.CurrentCamera
                 plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(camera_forstrafe.CFrame.LookVector.X, 0, camera_forstrafe.CFrame.LookVector.Z) * sped)
-                
+                plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
             elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.D) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
                 camera_forstrafe = workspace.CurrentCamera
                 plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(camera_forstrafe.CFrame.RightVector.X, 0, camera_forstrafe.CFrame.RightVector.Z) * sped)
+                plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
             elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.A) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
                 camera_forstrafe = workspace.CurrentCamera
                 plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(-camera_forstrafe.CFrame.RightVector.X, 0, -camera_forstrafe.CFrame.RightVector.Z) * sped)
-                
+                plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
             elseif getgenv().strafer and plr.Character and inp:IsKeyDown(Enum.KeyCode.Space) and getgenv().strafer and inp:IsKeyDown(Enum.KeyCode.S) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
                 camera_forstrafe = workspace.CurrentCamera
                 plr.Character.HumanoidRootPart.CFrame = CFrame.new(plr.Character.HumanoidRootPart.CFrame.Position + Vector3.new(-camera_forstrafe.CFrame.LookVector.X, 0, -camera_forstrafe.CFrame.LookVector.Z) * sped)
+                plr.Character.HumanoidRootPart.Velocity = Vector3.new(0, plr.Character.HumanoidRootPart.Velocity.Y, 0)
             end
                 ----------
             
@@ -328,7 +462,7 @@ move:AddToggle("Auto Strafer", false, function(isToggled)
         end
     end)
 end)
-move:AddSlider("Boost Strafe", 1, 250, 1500, 1, function(currentValue)
+move:AddSlider("Strafe Boost", 1, 250, 1500, 1, function(currentValue)
     sped = currentValue / 1000
 end)
 
@@ -361,6 +495,18 @@ desync:AddToggle("Fakelag Desync", false, function(isToggled)
         end
     end)
 end)
+
+local desync_bind = desync:AddToggle("Force Desync", false, function(isToggled)
+    getgenv().des = isToggled
+    game:GetService("RunService").PostSimulation:Connect(function()
+        if getgenv().des and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character.HumanoidRootPart.Anchored = true
+            plr.Character.HumanoidRootPart.Anchored = false
+        end
+    end)
+end)
+desync_bind:AddKeybind()
+
 local toggle1 = true
 local delay = 0.05
 local main_camera
@@ -608,7 +754,7 @@ changer:AddButton("Apply Colors", function()
     task.spawn(function()
         for _, i in pairs(game:GetService("ReplicatedStorage").Viewmodels:GetDescendants()) do
     
-            if i:IsA("Part") then
+            if i:IsA("Part") and i.Name ~= "Flash" and i.Name ~= "Mag" and i.Name ~= "Mag2" then
                 i.Color = Color3.fromRGB(clr12, clr22, clr32)
                 i.Transparency = transpa_arms
             end
@@ -708,6 +854,57 @@ impact:AddToggle("Impacts", false, function(isToggled)
             end)
         end
     end)
+end)
+
+local spam = misc:CreateSector("Trashtalk", "left")
+local mess = "get good. get gamescript . lua"
+spam:AddTextbox("Message", nil, function(State)
+    mess = State
+end)
+spam:AddToggle("Spamming", false, function(isToggled)
+    
+    getgenv().spamming = isToggled
+    task.spawn(function()
+        while task.wait(0.5) and getgenv().spamming do
+
+            game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("PlayerChatted"):FireServer(mess, false)
+
+        end
+    end)
+end)
+local hitsound = misc:CreateSector("Hit Sound", "right")
+local newvalue = nil
+local oldvalue = 0
+local volum = 25
+hitsound:AddToggle("Hit Sound", false, function(isToggled)
+    getgenv().hitso = isToggled
+    local hitsou = game:GetService("Players").LocalPlayer.Additionals.TotalDamage.Changed:Connect(function()
+        if getgenv().hitso then
+            newvalue = game:GetService("Players").LocalPlayer.Additionals.TotalDamage.Value
+            if newvalue ~= oldvalue and newvalue ~= 0 and workspace:FindFirstChild("HitSoundCool") then
+                oldvalue = game:GetService("Players").LocalPlayer.Additionals.TotalDamage.Value
+                workspace.HitSoundCool.Volume = volum
+                workspace.HitSoundCool:Play()
+            elseif not workspace:FindFirstChild("HitSoundCool") then
+
+                local sound_self = Instance.new("Sound", workspace)
+
+                sound_self.SoundId = "rbxassetid://3581383408"
+                sound_self.Name = "HitSoundCool"
+                sound_self.Volume = volum
+                sound_self:Play()
+            end
+        
+        end
+
+    end)
+    if not getgenv().hitso then
+        hitsou:Disconnect()
+    end
+    
+end)
+hitsound:AddSlider("Volume", 1, 25, 100, 1, function(currentValue)
+    volum = currentValue
 end)
 
 cfgs:CreateConfigSystem("left")
