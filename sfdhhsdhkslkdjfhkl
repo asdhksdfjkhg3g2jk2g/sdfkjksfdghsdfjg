@@ -4,7 +4,7 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/blood
 
 local plr = game.Players.LocalPlayer
 local watermark = Library:Window({
-   Text = "UEX - BETA"
+   Text = "UEX V1"
 })
 local Window = Library:Window({
    Text = "Bypass"
@@ -16,7 +16,7 @@ local Window2 = Library:Window({
 
 local default_grav = workspace.Gravity
 Window:Toggle({
-   Text = "Inf Jump",
+   Text = "Inf Jump Bypass",
    Callback = newcclosure(function(v)
         getgenv().inf = v
         local table1 = getrawmetatable(game.Workspace)
@@ -143,5 +143,47 @@ Window2:Toggle({
                 end
             end
         end))
+   end)
+})
+
+Window:Toggle({
+   Text = "Noclip Bypass",
+   Callback = newcclosure(function(Value)
+        getgenv().nc = Value
+        local position_to_teleport = nil
+        local stopped = false
+        for _, i in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+
+            if getgenv().nc then
+                if i:IsA("Part") or i:IsA("BasePart") then
+                    i.CanCollide = false
+                end
+            elseif not getgenv().nc then
+                if i.Name == "LeftLeg" or i.Name == "RightLeg" or i.Name == "LeftLowerLeg" or i.Name == "RightLowerLeg" then
+                    i.CanCollide = true
+                end
+            end
+
+        end
+        
+        local renderstep = game:GetService("RunService").RenderStepped:Connect(newcclosure(function()
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and not stopped then
+                position_to_teleport = plr.Character:FindFirstChild("HumanoidRootPart").CFrame.Position
+            end
+        end))
+
+        local connection = plr.Character:WaitForChild("HumanoidRootPart").Changed:Connect(newcclosure(function(property)
+            
+            if property == "Position" or property == "CFrame" then
+                stopped = true
+                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(position_to_teleport)
+                stopped = false
+            end
+        
+        end))
+        if not getgenv().nc then
+            connection:Disconnect()
+            renderstep:Disconnect()
+        end
    end)
 })
