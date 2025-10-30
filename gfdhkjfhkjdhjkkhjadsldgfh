@@ -1,4 +1,4 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))() --you can go into the github link and copy all of it and modify it for yourself.
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/asdhksdfjkhg3g2jk2g/sdfkjksfdghsdfjg/refs/heads/main/odsfosdjdfgdg.lua"))() --you can go into the github link and copy all of it and modify it for yourself.
 local Window = Library:CreateWindow("gamescript.rage V5", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
 local rage = Window:CreateTab("Ragebot")
 local antiaim = Window:CreateTab("Anti Aim")
@@ -59,15 +59,15 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                 end)
                                 before_shooting = true
                                 object_to_def = i.Character.HeadHB
-                                if getgenv().predict then
-                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity)
+                                if getgenv().predict2 then
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
                                 else
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                                 end
                                 task.spawn(function()
-                                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, true, game.Workspace, 0)
+                                    mouse1press()
                                     task.wait(0.003)
-                                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, false, game.Workspace, 0)
+                                    mouse1click()
                                 end)
                                 task.defer(function()
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, prevpos_need)
@@ -86,16 +86,15 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                     end
                                 end)
                                 before_shooting = true
-                                if getgenv().predict then
+                                if getgenv().predict2 then
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position + i.Character.HeadHB.Velocity * predict_power2)
                                 else
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, i.Character.HeadHB.Position)
                                 end
                                 task.spawn(function()
-                                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, true, game.Workspace, 0)
-                                    after_shooting = true
+                                    mouse1press()
                                     task.wait(0.003)
-                                    Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, false, game.Workspace, 0)
+                                    mouse1click()
                                     
                                 end)
                                 
@@ -138,7 +137,7 @@ double:AddToggle("Tapping", false, function(isToggled)
                     Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, true, game.Workspace, 0)
                     task.wait(0.006)
                     Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, false, game.Workspace, 0)
-                    task.wait(0.006)
+                    
                 end
                 
             elseif getgenv().dt and not upped and mode_dt == "Defensive Warp" and plr.Character and plr.Character:FindFirstChild("Humanoid") then
@@ -146,7 +145,7 @@ double:AddToggle("Tapping", false, function(isToggled)
                     Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, true, game.Workspace, 0)
                     task.wait(0.006)
                     Virtual:SendMouseButtonEvent(plr:GetMouse().X, plr:GetMouse().Y, 0, false, game.Workspace, 0)
-                    task.wait(0.006)
+                    
                 end
                 if getgenv().dt and plr.Character and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.W) and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Jumping then
                     camera_fordt = workspace.CurrentCamera
@@ -183,6 +182,9 @@ end)
 
 auto:AddToggle("Prediction", false, function(isToggled)
     getgenv().predict2 = isToggled
+end)
+auto:AddSlider("Predict Distance", 1, 5, 35, 1, function(currentValue)
+    predict_power2 = currentValue / 100
 end)
 
 auto:AddToggle("Force Stop", false, function(isToggled)
@@ -299,7 +301,7 @@ end)
 aim:AddToggle("Prediction", false, function(isToggled)
     getgenv().predict = isToggled
 end)
-aim:AddSlider("Prediction Value", 1, 5, 35, 1, function(currentValue)
+aim:AddSlider("Predict Distance", 1, 5, 35, 1, function(currentValue)
     predict_power = currentValue / 100
 end)
 
