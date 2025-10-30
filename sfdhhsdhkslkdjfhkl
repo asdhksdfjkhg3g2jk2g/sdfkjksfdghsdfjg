@@ -83,13 +83,6 @@ Window:Toggle({
             
             local origin = table.__index
             
-            task.spawn(function()
-                while task.wait() and getgenv().change and plr.Character and plr.Character:FindFirstChild("Humanoid") do
-                    plr.Character.Humanoid.WalkSpeed = speed
-                    plr.Character.Humanoid.JumpPower = jump
-                    plr.Character.Humanoid.JumpHeight = jump
-                end
-            end)
             table.__index = newcclosure(function(self, property)
                 
                 if property == "WalkSpeed" and getgenv().change and not checkcaller() then
@@ -98,6 +91,13 @@ Window:Toggle({
                     return default_Jump
                 end
                 return origin(self, property)
+            end)
+            task.spawn(function()
+                while task.wait() and getgenv().change and plr.Character and plr.Character:FindFirstChild("Humanoid") do
+                    plr.Character.Humanoid.WalkSpeed = speed
+                    plr.Character.Humanoid.JumpPower = jump
+                    plr.Character.Humanoid.JumpHeight = jump
+                end
             end)
             if not getgenv().change then
                 table.__index = origin
