@@ -35,7 +35,7 @@ Window:Toggle({
         game:GetService("UserInputService").JumpRequest:Connect(function(key)
                 
             if plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Freefall and getgenv().inf then
-                plr.Character.PrimaryPart.Velocity = Vector3.new(0, 35, 0)
+                plr.Character.HumanoidRootPart.Velocity = Vector3.new(plr.Character.HumanoidRootPart.Velocity.X, 35, plr.Character.HumanoidRootPart.Velocity.Z)
                 game.Workspace.Gravity = 50
                 task.wait(0.35)
                 game.Workspace.Gravity = default_grav
