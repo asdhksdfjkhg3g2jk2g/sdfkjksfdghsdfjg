@@ -50,7 +50,7 @@ Window:Toggle({
 
 local speed, jump
 Window:Slider({
-   Text = "Walk Speed",
+   Text = "Walk Speed Bypass",
    Default = 40,
    Minimum = 1,
    Maximum = 250,
@@ -60,7 +60,7 @@ Window:Slider({
 })
 
 Window:Slider({
-   Text = "Jump Boost",
+   Text = "Jump Boost Bypass",
    Default = 40,
    Minimum = 1,
    Maximum = 150,
@@ -84,9 +84,9 @@ Window:Toggle({
             
             table.__index = newcclosure(function(self, property)
                 
-                if property == "WalkSpeed" and getgenv().change then
+                if property == "WalkSpeed" and getgenv().change and not checkcaller() then
                     return default_Speed
-                elseif property == "JumpPower" or property == "JumpHeight" and getgenv().change then
+                elseif property == "JumpPower" or property == "JumpHeight" and getgenv().change and not checkcaller() then
                     return default_Jump
                 end
                 return origin(self, property)
