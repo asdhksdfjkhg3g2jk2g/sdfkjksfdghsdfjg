@@ -176,14 +176,29 @@ Window:Toggle({
             
             if property == "Position" or property == "CFrame" then
                 stopped = true
-                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(position_to_teleport)
+                for i = 0, 5 do
+                    plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(position_to_teleport)
+                end
                 stopped = false
             end
         
         end))
+
+        local table_noclip = getrawmetatable(plr.Character)
+        local orig_noclip = table_noclip.__index
+        setreadonly(table_noclip, false)
+        table_noclip.__index = function(self, property)
+
+            if property == "CanCollide" and not checkcaller() then
+                return true
+            end
+            return orig_noclip(self, property)
+        end
+
         if not getgenv().nc then
             connection:Disconnect()
             renderstep:Disconnect()
+            table_noclip.__index = orig_noclip
         end
    end)
 })
