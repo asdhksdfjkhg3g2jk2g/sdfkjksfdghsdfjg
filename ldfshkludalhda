@@ -1,0 +1,51 @@
+local plr = game.Players.LocalPlayer
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+
+local Window = Library.CreateLib("SRX Keyed", "Ocean")
+
+local Tab = Window:NewTab("Key System")
+
+local Section = Tab:NewSection("Main")
+local keyself = nil
+
+local prem_users = {
+    ""
+}
+local prem_key = "SRX-PRM-NT-EERF-3021"
+local game_self = "CB:RO Legit"
+
+local label = nil
+Section:NewTextBox("Key:", "PRESS ENTER NECESSARILY", function(txt)
+    keyself = txt
+end)
+Section:NewDropdown("Script:", "CB:RO Rage", {"CB:RO Legit", "CB:RO Rage", "UEX", "Jailbreak[SOON]"}, function(currentOption)
+    game_self = currentOption
+end)
+Section:NewButton("Load", "SRX", function()
+    if keyself == "fullfree" and game_self == "CB:RO Legit" then
+        if game.PlaceId == 301549746 then
+            label:UpdateLabel("Loading...")
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/robertwvrrke/legitgamescriptcbro/refs/heads/main/byrobert"))()
+            label:UpdateLabel("Perfect Load")
+        else
+            label:UpdateLabel("Join in CB:RO")
+        end
+    elseif keyself == "fullfree" and game_self == "CB:RO Rage" then
+        if game.PlaceId == 301549746 then
+            label:UpdateLabel("Loading...")
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/yyeptech/thebighubs/refs/heads/main/cbro.lua"))()
+            label:UpdateLabel("Perfect Load")
+        else
+            label:UpdateLabel("Join in CB:RO")
+        end
+    elseif keyself == "fullfree" and game_self == "UEX" then
+        label:UpdateLabel("Loading...")
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/yyeptech/thebighubs/refs/heads/main/fullyloader"))()
+        label:UpdateLabel("Perfect Load")
+    else
+        label:UpdateLabel("Invalid Key")
+    end
+end)
+ 
+label = Section:NewLabel("Waiting...")
