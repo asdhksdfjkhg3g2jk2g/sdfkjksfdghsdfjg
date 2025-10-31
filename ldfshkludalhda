@@ -34,7 +34,7 @@ Section:NewButton("Load", "SRX", function()
     elseif keyself == "fullfree" and game_self == "CB:RO Rage" then
         if game.PlaceId == 301549746 then
             label:UpdateLabel("Loading...")
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/yyeptech/thebighubs/refs/heads/main/cbro.lua"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/asdhksdfjkhg3g2jk2g/sdfkjksfdghsdfjg/refs/heads/main/gfdhkjfhkjdhjkkhjadsldgfh"))()
             label:UpdateLabel("Perfect Load")
         else
             label:UpdateLabel("Join in CB:RO")
