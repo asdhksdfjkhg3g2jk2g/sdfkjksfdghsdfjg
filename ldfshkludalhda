@@ -26,7 +26,7 @@ Section:NewButton("Load", "SRX", function()
     if keyself == "fullfree" and game_self == "CB:RO Legit" then
         if game.PlaceId == 301549746 then
             label:UpdateLabel("Loading...")
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/robertwvrrke/legitgamescriptcbro/refs/heads/main/byrobert"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/robertwvrrke/SRX-CBRO-SCRIPT/refs/heads/main/by%20robert"))()
             label:UpdateLabel("Perfect Load")
         else
             label:UpdateLabel("Join in CB:RO")
