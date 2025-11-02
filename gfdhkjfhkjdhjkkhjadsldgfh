@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/asdhksdfjkhg3g2jk2g/sdfkjksfdghsdfjg/refs/heads/main/odsfosdjdfgdg.lua"))() --you can go into the github link and copy all of it and modify it for yourself.
-local Window = Library:CreateWindow("Blueware.tech", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
+local Window = Library:CreateWindow("SRX: CB:RO Rage", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
 local rage = Window:CreateTab("Ragebot")
 local antiaim = Window:CreateTab("Anti Aim")
 local vis = Window:CreateTab("Visuals")
