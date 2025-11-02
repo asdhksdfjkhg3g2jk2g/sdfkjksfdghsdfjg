@@ -39,7 +39,7 @@ Section:NewButton("Load", "SRX", function()
         else
             label:UpdateLabel("Join in CB:RO")
         end
-    elseif keyself == "fullfree" and game_self == "UEX" then
+    elseif keyself == "fullfree" and game_self == "Universal Exploits" then
         label:UpdateLabel("Loading...")
         loadstring(game:HttpGet("https://raw.githubusercontent.com/yyeptech/thebighubs/refs/heads/main/fullyloader"))()
         label:UpdateLabel("Perfect Load")
