@@ -19,7 +19,7 @@ local label = nil
 Section:NewTextBox("Key:", "PRESS ENTER NECESSARILY", function(txt)
     keyself = txt
 end)
-Section:NewDropdown("Script:", "CB:RO Rage", {"CB:RO Legit", "CB:RO Rage", "Universal Exploits"}, function(currentOption)
+Section:NewDropdown("Script:", "CB:RO Rage", {"CB:RO Legit", "Universal Exploits"}, function(currentOption)
     game_self = currentOption
 end)
 Section:NewButton("Load", "SRX", function()
@@ -27,14 +27,6 @@ Section:NewButton("Load", "SRX", function()
         if game.PlaceId == 301549746 then
             label:UpdateLabel("Loading...")
             loadstring(game:HttpGet("https://raw.githubusercontent.com/robertwvrrke/SRX-CBRO-SCRIPT/refs/heads/main/by%20robert"))()
-            label:UpdateLabel("Perfect Load")
-        else
-            label:UpdateLabel("Join in CB:RO")
-        end
-    elseif keyself == "fullfree" and game_self == "CB:RO Rage" then
-        if game.PlaceId == 301549746 then
-            label:UpdateLabel("Loading...")
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/asdhksdfjkhg3g2jk2g/sdfkjksfdghsdfjg/refs/heads/main/gfdhkjfhkjdhjkkhjadsldgfh"))()
             label:UpdateLabel("Perfect Load")
         else
             label:UpdateLabel("Join in CB:RO")
