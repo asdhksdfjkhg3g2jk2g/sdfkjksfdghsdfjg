@@ -49,3 +49,4 @@ Section:NewButton("Load", "SRX", function()
 end)
  
 label = Section:NewLabel("Waiting...")
+label = Section:NewLabel("Free Key in https://discord.gg/E5Tt4yYYMr")
