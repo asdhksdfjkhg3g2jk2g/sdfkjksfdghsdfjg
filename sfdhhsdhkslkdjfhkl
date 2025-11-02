@@ -224,7 +224,7 @@ local fallspeed = 3
 Window2:Slider({
    Text = "Fall Speed",
    Default = 3,
-   Minimum = 0,
+   Minimum = -1,
    Maximum = 15,
    Callback = function(value)
        fallspeed = value
