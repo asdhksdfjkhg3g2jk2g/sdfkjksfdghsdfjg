@@ -211,7 +211,7 @@ Window2:Toggle({
    end)
 })
 local flyingspeed = 30
-Window2:Slider({
+Window:Slider({
    Text = "Fly Speed",
    Default = 30,
    Minimum = 1,
@@ -221,7 +221,7 @@ Window2:Slider({
    end
 })
 local fallspeed = 3
-Window2:Slider({
+Window:Slider({
    Text = "Fall Speed",
    Default = 3,
    Minimum = -1,
@@ -231,7 +231,7 @@ Window2:Slider({
    end
 })
 local curCamera = workspace.CurrentCamera
-Window2:Toggle({
+Window:Toggle({
    Text = "Fly Bypass",
    Callback = newcclosure(function(Value)
        getgenv().fly = Value
