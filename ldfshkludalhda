@@ -19,7 +19,7 @@ local label = nil
 Section:NewTextBox("Key:", "PRESS ENTER NECESSARILY", function(txt)
     keyself = txt
 end)
-Section:NewDropdown("Script:", "CB:RO Rage", {"CB:RO Legit", "CB:RO Rage", "UEX", "Jailbreak[SOON]"}, function(currentOption)
+Section:NewDropdown("Script:", "CB:RO Rage", {"CB:RO Legit", "CB:RO Rage", "Universal Exploits"}, function(currentOption)
     game_self = currentOption
 end)
 Section:NewButton("Load", "SRX", function()
