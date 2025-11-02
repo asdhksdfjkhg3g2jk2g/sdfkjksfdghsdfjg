@@ -155,7 +155,7 @@ Window2:Toggle({
 })
 
 Window2:Toggle({
-   Text = "Noclip",
+   Text = "Noclip Advanced",
    Callback = newcclosure(function(Value)
         getgenv().nc = Value
         local position_to_teleport = nil
