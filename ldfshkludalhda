@@ -41,7 +41,7 @@ Section:NewButton("Load", "SRX", function()
         end
     elseif keyself == "fullfree" and game_self == "Universal Exploits" then
         label:UpdateLabel("Loading...")
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/yyeptech/thebighubs/refs/heads/main/fullyloader"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/asdhksdfjkhg3g2jk2g/sdfkjksfdghsdfjg/refs/heads/main/sfdhhsdhkslkdjfhkl"))()
         label:UpdateLabel("Perfect Load")
     else
         label:UpdateLabel("Invalid Key")
