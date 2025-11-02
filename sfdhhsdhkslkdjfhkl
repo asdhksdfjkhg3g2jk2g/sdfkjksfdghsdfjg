@@ -175,14 +175,14 @@ Window2:Toggle({
         end
         
         local renderstep = game:GetService("RunService").RenderStepped:Connect(newcclosure(function()
-            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and not stopped then
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and not stopped and getgenv().nc then
                 position_to_teleport = plr.Character:FindFirstChild("HumanoidRootPart").CFrame.Position
             end
         end))
-
+        
         local connection = plr.Character:WaitForChild("HumanoidRootPart").Changed:Connect(newcclosure(function(property)
             
-            if property == "Position" or property == "CFrame" then
+            if property == "Position" or property == "CFrame" and getgenv().nc then
                 stopped = true
                 for i = 0, 5 do
                     plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(position_to_teleport)
@@ -197,7 +197,7 @@ Window2:Toggle({
         setreadonly(table_noclip, false)
         table_noclip.__index = newcclosure(function(self, property)
 
-            if property == "CanCollide" and not checkcaller() then
+            if property == "CanCollide" and not checkcaller() and getgenv().nc  then
                 return true
             end
             return orig_noclip(self, property)
