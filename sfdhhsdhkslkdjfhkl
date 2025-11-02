@@ -4,10 +4,14 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/blood
 
 local plr = game.Players.LocalPlayer
 local watermark = Library:Window({
-   Text = "UEX V1"
+   Text = "SRX: Universal Exploits"
+})
+watermark:Label({
+   Text = "Version: 1.1.0",
+   Color = Color3.fromRGB(255, 255, 255)
 })
 local Window = Library:Window({
-   Text = "Bypass"
+   Text = "Movement"
 })
 local Window2 = Library:Window({
    Text = "Manipulations"
@@ -108,7 +112,7 @@ Window:Toggle({
         end
    end)
 })
-Window:Toggle({
+Window2:Toggle({
    Text = "Simple Anti Kick",
    Callback = newcclosure(function(Value)
        getgenv().akick = Value
@@ -150,8 +154,8 @@ Window2:Toggle({
    end)
 })
 
-Window:Toggle({
-   Text = "Noclip Bypass",
+Window2:Toggle({
+   Text = "Noclip",
    Callback = newcclosure(function(Value)
         getgenv().nc = Value
         local position_to_teleport = nil
@@ -191,13 +195,13 @@ Window:Toggle({
         local table_noclip = getrawmetatable(plr.Character)
         local orig_noclip = table_noclip.__index
         setreadonly(table_noclip, false)
-        table_noclip.__index = function(self, property)
+        table_noclip.__index = newcclosure(function(self, property)
 
             if property == "CanCollide" and not checkcaller() then
                 return true
             end
             return orig_noclip(self, property)
-        end
+        end)
 
         if not getgenv().nc then
             connection:Disconnect()
@@ -205,4 +209,74 @@ Window:Toggle({
             table_noclip.__index = orig_noclip
         end
    end)
+})
+local flyingspeed = 30
+Window2:Slider({
+   Text = "Fly Speed",
+   Default = 30,
+   Minimum = 1,
+   Maximum = 500,
+   Callback = function(value)
+       flyingspeed = value
+   end
+})
+local fallspeed = 3
+Window2:Slider({
+   Text = "Fall Speed",
+   Default = 3,
+   Minimum = 0,
+   Maximum = 15,
+   Callback = function(value)
+       fallspeed = value
+   end
+})
+local curCamera = workspace.CurrentCamera
+Window2:Toggle({
+   Text = "Fly Bypass",
+   Callback = newcclosure(function(Value)
+       getgenv().fly = Value
+        task.spawn(newcclosure(function()
+            if getexecutorname() ~= "Delta" or getexecutorname() ~= "Krnl" or getexecutorname() ~= "Codex" or getexecutorname() ~= "Cryptic" then
+                while game:GetService("RunService").RenderStepped:Wait() and getgenv().fly do
+                    if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.W) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") then
+                        curCamera = workspace.CurrentCamera
+                        plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+                        plr.Character.HumanoidRootPart.Velocity = curCamera.CFrame.LookVector * flyingspeed
+                    elseif game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.S) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") then
+                        curCamera = workspace.CurrentCamera
+                        plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+                        plr.Character.HumanoidRootPart.Velocity = -curCamera.CFrame.LookVector * flyingspeed
+                    elseif game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.A) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") then
+                        curCamera = workspace.CurrentCamera
+                        plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+                        plr.Character.HumanoidRootPart.Velocity = -curCamera.CFrame.RightVector * flyingspeed
+                    elseif game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.D) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") then
+                        curCamera = workspace.CurrentCamera
+                        plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+                        plr.Character.HumanoidRootPart.Velocity = curCamera.CFrame.RightVector * flyingspeed
+                    else
+                        plr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+                        plr.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, -fallspeed, 0)
+                    end
+                end
+            else
+                Library:Notification({
+                    Text = "For now, Fly Bypass doesn't work with Mobile.",
+                    Duration = 3
+                })
+            end
+        end))
+   end)
+})
+Window2:Button({
+   Text = "Equip All Tools",
+   Callback = function()
+       for _, i in pairs(game.Players.LocalPlayer.Backpack:GetDescendants()) do
+        
+            if i:IsA("Tool") and plr.Character then
+                i.Parent = plr.Character
+            end
+
+       end
+   end
 })
