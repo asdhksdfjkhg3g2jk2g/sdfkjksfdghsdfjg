@@ -1,13 +1,23 @@
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/Revenant", true))()
 
+Library:Notification({
+    Text = "Executed Successfuly",
+    Duration = 3
+})
+
+
 
 local plr = game.Players.LocalPlayer
 local watermark = Library:Window({
-   Text = "SRX: Universal Exploits"
+   Text = "Dotware.rbx"
 })
 watermark:Label({
    Text = "Version: 1.1.0",
+   Color = Color3.fromRGB(255, 255, 255)
+})
+watermark:Label({
+   Text = "Our goal: Create a fully undetected Universal Script",
    Color = Color3.fromRGB(255, 255, 255)
 })
 local Window = Library:Window({
@@ -20,7 +30,7 @@ local Window2 = Library:Window({
 
 local default_grav = workspace.Gravity
 Window:Toggle({
-   Text = "Inf Jump Bypass",
+   Text = "Inf Jump Bypassed",
    Callback = newcclosure(function(v)
         getgenv().inf = v
         local table1 = getrawmetatable(game.Workspace)
@@ -55,7 +65,7 @@ Window:Toggle({
 
 local speed, jump
 Window:Slider({
-   Text = "Walk Speed Bypass",
+   Text = "Walk Speed Bypassed",
    Default = 40,
    Minimum = 1,
    Maximum = 250,
@@ -65,7 +75,7 @@ Window:Slider({
 })
 
 Window:Slider({
-   Text = "Jump Boost Bypass",
+   Text = "Jump Boost Bypassed",
    Default = 40,
    Minimum = 1,
    Maximum = 150,
@@ -140,7 +150,7 @@ Window2:Toggle({
    end)
 })
 Window2:Toggle({
-   Text = "Simple Desync",
+   Text = "No server tracker / Desync",
    Callback = newcclosure(function(Value)
        getgenv().fdesync = Value
         task.spawn(newcclosure(function()
@@ -232,7 +242,7 @@ Window:Slider({
 })
 local curCamera = workspace.CurrentCamera
 Window:Toggle({
-   Text = "Fly Bypass",
+   Text = "Fly Bypassed",
    Callback = newcclosure(function(Value)
        getgenv().fly = Value
         task.spawn(newcclosure(function()
