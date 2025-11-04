@@ -16,10 +16,7 @@ watermark:Label({
    Text = "Version: 1.1.0",
    Color = Color3.fromRGB(255, 255, 255)
 })
-watermark:Label({
-   Text = "Our goal: Create a fully undetected Universal Script",
-   Color = Color3.fromRGB(255, 255, 255)
-})
+
 local Window = Library:Window({
    Text = "Movement"
 })
