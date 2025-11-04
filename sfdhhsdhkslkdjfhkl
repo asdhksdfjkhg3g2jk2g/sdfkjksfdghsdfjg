@@ -147,7 +147,7 @@ Window2:Toggle({
    end)
 })
 Window2:Toggle({
-   Text = "No server tracker / Desync",
+   Text = "No server tracker",
    Callback = newcclosure(function(Value)
        getgenv().fdesync = Value
         task.spawn(newcclosure(function()
