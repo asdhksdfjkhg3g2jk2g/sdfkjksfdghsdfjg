@@ -13,7 +13,7 @@ local watermark = Library:Window({
    Text = "Dotware.rbx"
 })
 watermark:Label({
-   Text = "Version: 1.1.0",
+   Text = "Version: 1.1.1",
    Color = Color3.fromRGB(255, 255, 255)
 })
 
@@ -151,12 +151,30 @@ Window2:Toggle({
    Callback = newcclosure(function(Value)
        getgenv().fdesync = Value
         task.spawn(newcclosure(function()
-            while task.wait() and getgenv().fdesync do
-                if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                    plr.Character.HumanoidRootPart.Anchored = true
-                    plr.Character.HumanoidRootPart.Anchored = false
+            local table_track = getrawmetatable(plr.Character)
+            local orig_track = table_track.__index
+            setreadonly(table_track, false)
+
+            table_track.__index = newcclosure(function(self, property)
+
+                if property == "Anchored" and not checkcaller() and getgenv().nc  then
+                    return false
                 end
+                return orig_track(self, property)
+            end)
+
+            task.spawn(function()
+                while task.wait() and getgenv().fdesync do
+                    if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                        plr.Character.HumanoidRootPart.Anchored = true
+                        plr.Character.HumanoidRootPart.Anchored = false
+                    end
+                end
+            end)
+            if not getgenv().nc then
+                table_track.__index = orig_track
             end
+
         end))
    end)
 })
