@@ -10,7 +10,7 @@ Library:Notification({
 
 local plr = game.Players.LocalPlayer
 local watermark = Library:Window({
-   Text = "Dotware.rbx"
+   Text = "Dotwave.rbx"
 })
 watermark:Label({
    Text = "Version: 1.1.1",
