@@ -11,7 +11,7 @@ local runservice = game:GetService("RunService")
 local tweenservice = game:GetService("TweenService")
 local marketplaceservice = game:GetService("MarketplaceService")
 local textservice = game:GetService("TextService")
-local coregui = game:GetService("CoreGui")
+local coregui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local httpservice = game:GetService("HttpService")
 
 local player = players.LocalPlayer
