@@ -10,10 +10,10 @@ Library:Notification({
 
 local plr = game.Players.LocalPlayer
 local watermark = Library:Window({
-   Text = "Dotwave.rbx"
+   Text = "J-HAX"
 })
 watermark:Label({
-   Text = "Version: 1.1.1",
+   Text = "Version: 1.2.0",
    Color = Color3.fromRGB(255, 255, 255)
 })
 
@@ -62,20 +62,20 @@ Window:Toggle({
 
 local speed, jump
 Window:Slider({
-   Text = "Walk Speed Bypassed",
+   Text = "Walk Speed",
    Default = 40,
    Minimum = 1,
-   Maximum = 250,
+   Maximum = 400,
    Callback = function(value)
        speed = value
    end
 })
 
 Window:Slider({
-   Text = "Jump Boost Bypassed",
+   Text = "Jump Boost",
    Default = 40,
    Minimum = 1,
-   Maximum = 150,
+   Maximum = 400,
    Callback = function(value)
        jump = value
    end
@@ -84,7 +84,7 @@ Window:Slider({
 local default_Speed = game.StarterPlayer.CharacterWalkSpeed
 local default_Jump = game.StarterPlayer.CharacterJumpPower
 Window:Toggle({
-   Text = "Enabled",
+   Text = "Simple Bypass",
    Callback = newcclosure(function(v)
        getgenv().change = v
         if getgenv().change then
@@ -117,6 +117,27 @@ Window:Toggle({
                 plr.Character.Humanoid.JumpHeight = default_Jump
             end
         end
+   end)
+})
+Window:Toggle({
+   Text = "Advanced Bypass(Speed)",
+   Callback = newcclosure(function(v)
+       getgenv().advn = v
+
+       local speed_bypass = game:GetService("RunService").RenderStepped:Connect(function ()
+
+            if getgenv().advn and plr.Character and plr.Character:FindFirstChild("Humanoid") then
+                
+                plr.Character:FindFirstChild("HumanoidRootPart").Velocity = Vector3.new(plr.Character:FindFirstChild("Humanoid").MoveDirection.X * speed, plr.Character:FindFirstChild("HumanoidRootPart").Velocity.Y, plr.Character:FindFirstChild("Humanoid").MoveDirection.Z * speed)
+
+            end
+        
+       end)
+
+       if not getgenv().advn then
+            speed_bypass:Disconnect()
+            
+       end
    end)
 })
 Window2:Toggle({
