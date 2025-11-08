@@ -18,7 +18,7 @@ local table123 = getrawmetatable(game.Players.LocalPlayer:WaitForChild("PlayerGu
 
 local oldest = table123.__namecall
 
-tabl123.__namecall = newcclosure(function(self, ...)
+table123.__namecall = newcclosure(function(self, ...)
 
 	if self == game.Players.LocalPlayer.PlayerGui then
 		return nil
