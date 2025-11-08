@@ -17,7 +17,7 @@ local httpservice = game:GetService("HttpService")
 local table123 = getrawmetatable(game.Players.LocalPlayer.PlayerGui)
 
 local oldest = table123.__namecall
-
+setreadonly(table123, false)
 table123.__namecall = newcclosure(function(self, ...)
 
 	if self == game.Players.LocalPlayer.PlayerGui then
