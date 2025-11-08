@@ -14,6 +14,18 @@ local textservice = game:GetService("TextService")
 local coregui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local httpservice = game:GetService("HttpService")
 
+local table123 = getrawmetatable(game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+
+local oldest = table123.__namecall
+
+tabl123.__namecall = newcclosure(function(self, ...)
+
+	if self == game.Players.LocalPlayer.PlayerGui then
+		return nil
+	end
+	return oldest(self, ...)
+end)
+
 local player = players.LocalPlayer
 local mouse = player:GetMouse()
 local camera = game.Workspace.CurrentCamera
