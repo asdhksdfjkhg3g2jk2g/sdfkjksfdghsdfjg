@@ -20,7 +20,7 @@ local oldest = table123.__namecall
 setreadonly(table123, false)
 table123.__namecall = newcclosure(function(self, ...)
 
-	if self == game.Players.LocalPlayer.PlayerGui then
+	if self == coregui then
 		return nil
 	end
 	return oldest(self, ...)
