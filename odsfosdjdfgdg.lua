@@ -11,20 +11,8 @@ local runservice = game:GetService("RunService")
 local tweenservice = game:GetService("TweenService")
 local marketplaceservice = game:GetService("MarketplaceService")
 local textservice = game:GetService("TextService")
-local coregui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local coregui = game:GetService("CoreGui")
 local httpservice = game:GetService("HttpService")
-
-local table123 = getrawmetatable(game.Players.LocalPlayer.PlayerGui)
-
-local oldest = table123.__namecall
-setreadonly(table123, false)
-table123.__namecall = newcclosure(function(self, ...)
-
-	if self == coregui then
-		return nil
-	end
-	return oldest(self, ...)
-end)
 
 local player = players.LocalPlayer
 local mouse = player:GetMouse()
