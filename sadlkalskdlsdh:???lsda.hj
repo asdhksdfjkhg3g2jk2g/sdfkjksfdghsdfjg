@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/asdhksdfjkhg3g2jk2g/sdfkjksfdghsdfjg/refs/heads/main/odsfosdjdfgdg.lua"))() --you can go into the github link and copy all of it and modify it for yourself.
-local Window = Library:CreateWindow("Bluewave.tech V1", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
+local Window = Library:CreateWindow("Bluewave.tech", Vector2.new(492, 598), Enum.KeyCode.Insert) --you can change your UI keybind
 local rage = Window:CreateTab("Ragebot")
 local antiaim = Window:CreateTab("Anti Aim")
 local vis = Window:CreateTab("Visuals")
@@ -27,6 +27,7 @@ getgenv().predict2 = false
 getgenv().forcestopping = false
 getgenv().jit = false
 getgenv().awall = false
+getgenv().hypertrack = false
 local penetrate_enabled = false
 local object_to_def = nil
 local before_shooting, after_shooting = false, false
@@ -64,6 +65,9 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                             end
                                         end
                                     end)
+                                    if getgenv().hypertrack then
+                                        settings().Network.IncomingReplicationLag = 0.9
+                                    end
                                     before_shooting = true
 
                                     if getgenv().predict2 and i.Character and i.Character:FindFirstChild("HeadHB") then
@@ -79,6 +83,10 @@ auto:AddToggle("Auto Shoot", false, function(isToggled)
                                     end)
 
                                     after_shooting = true
+
+                                    if getgenv().hypertrack then
+                                        settings().Network.IncomingReplicationLag = 0
+                                    end
                                 end
                             end
                             if penetrate_enabled and (i.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude < 70 and getgenv().firing then
@@ -193,8 +201,8 @@ end)
 auto:AddToggle("Force Stop", false, function(isToggled)
     getgenv().forcestopping = isToggled
 end)
-auto:AddToggle("Auto Wall - SOON", false, function(isToggled)
-    getgenv().awall = isToggled
+auto:AddToggle("Hyper Tracking", false, function(isToggled)
+    getgenv().hypertrack = isToggled
 end)
 auto:AddToggle("Report misses (F9)", false, function(isToggled)
     getgenv().report = isToggled
@@ -865,7 +873,7 @@ impact:AddToggle("Impacts", false, function(isToggled)
 end)
 
 local spam = misc:CreateSector("Trashtalk", "left")
-local mess = "get good. get gamescript . lua"
+local mess = "Why you are losing?"
 spam:AddTextbox("Message", nil, function(State)
     mess = State
 end)
