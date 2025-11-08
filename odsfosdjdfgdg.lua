@@ -14,7 +14,7 @@ local textservice = game:GetService("TextService")
 local coregui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local httpservice = game:GetService("HttpService")
 
-local table123 = getrawmetatable(game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+local table123 = getrawmetatable(game.Players.LocalPlayer.PlayerGui)
 
 local oldest = table123.__namecall
 
